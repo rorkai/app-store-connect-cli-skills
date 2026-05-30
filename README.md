@@ -11,6 +11,12 @@ Skills follow the Agent Skills format.
 Install this skill pack:
 
 ```bash
+asc install-skills
+```
+
+Or install directly from GitHub:
+
+```bash
 npx skills add rorkai/app-store-connect-cli-skills
 ```
 

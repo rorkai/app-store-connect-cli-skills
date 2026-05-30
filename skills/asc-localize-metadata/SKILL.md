@@ -177,7 +177,7 @@ asc apps info edit --app "APP_ID" --version-id "VERSION_ID" --locale "nl-NL" \
 For app-level fields:
 ```bash
 # Subtitle/name (app-info localization) is managed via app-info localizations.
-# Use the app-info localization .strings + upload flow (there is no `asc app-infos localizations ...` command).
+# Use the app-info localization .strings + upload flow; there is no app-infos localizations command.
 #
 # 1) Edit: ./app-info-localizations/nl-NL.strings
 # "subtitle" = "Leer tafels spelenderwijs";

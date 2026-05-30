@@ -12,6 +12,15 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
   - `asc --help`
   - `asc builds --help`
   - `asc builds list --help`
+- Use `asc search` for local, deterministic command discovery when you know the workflow but not the command path.
+  - `asc search "submit app for review"`
+  - `asc search --output table "upload build"`
+- Use `asc schema` to inspect bundled App Store Connect endpoint schemas and request/query fields before designing API-facing commands.
+  - `asc schema --pretty "GET /v1/apps"`
+  - `asc schema --method POST appStoreVersions`
+- Use `asc capabilities` to explain CLI-supported, partial, web-only, and public-API-limited workflow coverage.
+  - `asc capabilities --area release --output table`
+  - `asc capabilities --status not-public-api --output markdown`
 
 ## Canonical verbs (current asc)
 - Prefer `view` over legacy `get` aliases for read-only commands in docs and automation.

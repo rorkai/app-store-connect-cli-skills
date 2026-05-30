@@ -113,7 +113,7 @@ Minimal `.asc/screenshots.json` example:
 
 ## 4) Frame screenshots with `asc screenshots frame`
 
-asc cli pins framing to Koubou `0.18.1`.
+The asc CLI pins framing to Koubou `0.18.1`.
 Install and verify before running framing steps:
 
 ```bash
@@ -157,6 +157,13 @@ asc screenshots review-open --output-dir "./screenshots/review"
 asc screenshots review-approve --all-ready --output-dir "./screenshots/review"
 ```
 
+For reviewed multi-locale sets, prefer the plan/apply flow so existing remote screenshot counts are included before upload:
+
+```bash
+asc screenshots plan --app "APP_ID" --version "1.2.3" --review-output-dir "./screenshots/review" --output json
+asc screenshots apply --app "APP_ID" --version "1.2.3" --review-output-dir "./screenshots/review" --confirm --output json
+```
+
 Upload from the configured source directory (default `./screenshots/framed` when framing is enabled):
 
 ```bash
@@ -182,6 +189,7 @@ asc screenshots list --version-localization "LOC_ID" --output table
 - Ensure screenshot files exist before upload.
 - Use explicit long flags (`--app`, `--output`, `--version-localization`, etc.).
 - Treat screenshot-local automation as experimental and call it out in user-facing handoff notes.
+- Use `asc screenshots plan` / `asc screenshots apply` for reviewed batches when you need append-limit guardrails across existing remote screenshots.
 - If framing fails with a version error, re-install pinned Koubou: `pip install koubou==0.18.1`.
 - If framing fails because device frames are missing, run `kou setup-frames` once with network access.
 

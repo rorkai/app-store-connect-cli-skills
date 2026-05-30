@@ -202,6 +202,14 @@ asc iap submit --iap-id "IAP_ID" --confirm
 
 For the first IAP on an app, or the first time adding a new IAP type, Apple may require selecting the IAP from the app version's "In-App Purchases and Subscriptions" section before submitting the app version. Prepare the IAP with localization, pricing, and review screenshot data first.
 
+For non-renewing IAPs that must be attached to the next app version review, the public API may reject the review item path. The CLI exposes an experimental web-session escape hatch that mirrors the App Store Connect web flow:
+
+```bash
+asc web review iaps attach --app "APP_ID" --iap-id "IAP_ID" --confirm
+```
+
+Use this only for the web-only first-version selection gap, and call out that it uses unofficial Apple web-session endpoints.
+
 ### Game Center needs app-version and review-submission items
 
 ```bash

@@ -6,12 +6,14 @@ description: Run an offline ASO audit on canonical App Store metadata under `./m
 # asc ASO audit
 
 Run a two-phase ASO audit: offline checks against local metadata files, then keyword gap analysis via Astro MCP.
+When available, include Apple-generated app tags as a discoverability signal.
 
 ## Preconditions
 
 - Metadata pulled locally into canonical files via `asc metadata pull --app "APP_ID" --version "1.2.3" --dir "./metadata"`.
 - If metadata came from `asc migrate export` or `asc localizations download`, normalize it into the canonical `./metadata` layout before running this skill.
 - For Astro gap analysis: app tracked in Astro MCP (optional — offline checks run without it).
+- For Apple-generated discoverability tags: `asc app-tags list --app "APP_ID" --output json` works when the API returns tags for the app.
 
 ## Before You Start
 
@@ -47,6 +49,20 @@ How to check:
    - **Arabic:** split by whitespace, then also generate prefix-stripped variants (remove ال prefix) since Apple likely normalizes definite articles. For example, "القرآن" in subtitle should flag both "القرآن" and "قرآن" in keywords.
 4. Split keywords by comma, trim whitespace, lowercase
 5. Report intersection (including fuzzy matches from prefix stripping)
+
+### Optional: App Tag Alignment
+
+App tags are Apple-generated labels that can appear in search results and product pages. They are not editable ASO metadata, but they are useful evidence for whether Apple's classification matches the intended positioning.
+
+```bash
+asc app-tags list --app "APP_ID" --output json
+asc app-tags view --app "APP_ID" --id "TAG_ID" --output json
+```
+
+Use tags as context only:
+- If visible tags reinforce the subtitle/keyword strategy, note the alignment.
+- If tags point to an unintended category or use case, recommend metadata/category changes that may improve future classification.
+- Do not promise that changing metadata will immediately change Apple-generated tags.
 
 ### 2. Underutilized Fields
 

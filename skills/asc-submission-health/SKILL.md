@@ -176,6 +176,14 @@ asc review items-add --submission "SUBMISSION_ID" --item-type gameCenterChalleng
 asc review submissions-submit --id "SUBMISSION_ID" --confirm
 ```
 
+For non-renewing IAPs that Apple requires to be selected with the next app version, the public API can reject both direct review items and standalone IAP submission. After validating IAP readiness, use the experimental web-session attachment only for that web-only gap:
+
+```bash
+asc web review iaps attach --app "APP_ID" --iap-id "IAP_ID" --confirm
+```
+
+This command uses unofficial Apple web-session endpoints and should be documented in the handoff.
+
 ## Monitor
 
 ```bash
