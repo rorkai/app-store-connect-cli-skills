@@ -1,6 +1,6 @@
 # asc cli skills
 
-A collection of Agent Skills for shipping with the [asc cli](https://github.com/rorkai/App-Store-Connect-CLI) (`asc`). These skills are designed for zero-friction automation around builds, TestFlight, metadata, submissions, and signing.
+A collection of Agent Skills for shipping with the [asc cli](https://github.com/rorkai/App-Store-Connect-CLI) (`asc`). These skills help agents run builds, TestFlight, metadata, submissions, signing, and Apple Ads workflows.
 
 This is a community-maintained, unofficial skill pack and is not affiliated with Apple.
 
@@ -29,11 +29,27 @@ Guidance for running `asc` commands (canonical verbs, flags, pagination, output,
 **Use when:**
 - You need the correct `asc` command or flag combination
 - You want JSON-first output and pagination tips for automation
+- You need Apple Ads command, auth, org, payload, or pagination guidance
 
 **Example:**
 
 ```bash
 Find the right asc command to list all builds for app 123456789 as JSON and paginate through everything.
+```
+
+### asc-apple-ads
+
+Apple Ads auth, org lookup, campaigns, ad groups, ads, keywords, reports, raw API calls, and safe live testing.
+
+**Use when:**
+- You need to read or change Apple Ads resources with `asc ads`
+- You need Apple Ads OAuth, profile, or `ASC_ADS_*` guidance
+- You need a safe read-first plan before mutating a live Ads account
+
+**Example:**
+
+```bash
+Find my Apple Ads org, list campaigns as JSON, and draft a safe plan before creating any test campaign.
 ```
 
 ### asc-workflow
