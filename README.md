@@ -49,7 +49,7 @@ Apple Ads auth, org lookup, campaigns, ad groups, ads, keywords, reports, raw AP
 **Example:**
 
 ```bash
-Find my Apple Ads org, list campaigns as JSON, create a paused test campaign, and clean it up after verification.
+Find my Apple Ads org, list campaigns as JSON, and draft a safe plan before creating any test campaign.
 ```
 
 ### asc-workflow

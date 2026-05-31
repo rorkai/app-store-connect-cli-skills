@@ -136,7 +136,7 @@ asc ads targeting-keywords delete-bulk \
 asc ads campaigns delete --org "123456" --campaign 987654321 --confirm
 ```
 
-For live tests, create paused resources with names such as `ASC CLI Live Test <timestamp>`. Clean up by deleting the parent campaign. Apple may reject direct deletion for default product page creative ads, but deleting the parent campaign or ad group can clean up the test resource.
+For live tests, create paused resources with names such as `ASC CLI Live Test <timestamp>`. Clean up only the parent campaign or ad group created for that test. Apple may reject direct deletion for default product page creative ads, but deleting the test parent campaign or ad group can clean up the test resource.
 
 ## Raw API
 
@@ -160,5 +160,5 @@ Raw requests accept only Apple Ads v5 paths or `https://api.searchads.apple.com/
 - Create paused or future-dated resources.
 - Use a unique test name.
 - Save created IDs from JSON output.
-- Delete the parent campaign at the end.
+- Delete only the test parent campaign or ad group created during the run.
 - Run a final campaigns find/list query to confirm cleanup.
