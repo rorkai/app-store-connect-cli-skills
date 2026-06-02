@@ -41,6 +41,9 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
 ## Rotation and cleanup
 - Revoke old certificates:
   - `asc certificates revoke --id "CERT_ID" --confirm`
+- Audit remote provisioning profiles before deleting or rotating:
+  - `asc profiles list --profile-state ACTIVE,INVALID --paginate --output json`
+  - Apple `profileState` is not a complete expiration signal: some profiles can have a past `expirationDate` while still reporting `ACTIVE`. For true expired-profile audits, compare `expirationDate` against the current date instead of relying only on `INVALID`.
 - Delete old profiles:
   - `asc profiles delete --id "PROFILE_ID" --confirm`
 - Clean local Xcode provisioning profiles:
