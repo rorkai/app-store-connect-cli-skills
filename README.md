@@ -130,6 +130,21 @@ Readiness-first App Store submission guidance, including `asc validate`, `asc re
 Check whether version 2.4.0 of my iOS app is ready for App Store submission, show the blockers, and tell me the next `asc` command to run.
 ```
 
+### asc-agent-ios-release
+
+Agent-oriented iOS release flow for using `asc` instead of App Store Connect web UI.
+
+**Use when:**
+- You want an agent to submit an iOS version through CLI commands
+- You need build/version resolution, metadata staging, review submission, and status verification
+- You need a hard rule that "submitted" means a real review status such as `WAITING_FOR_REVIEW`
+
+**Example:**
+
+```bash
+Submit iOS version 1.0.78 with build 79 using asc, then verify the App Store Connect review status.
+```
+
 ### asc-signing-setup
 
 Bundle IDs, capabilities, certificates, provisioning profiles, and encrypted signing sync.
