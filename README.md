@@ -147,6 +147,21 @@ Agent-first screenshot pipeline using xcodebuild/simctl, AXe, JSON plans, `asc s
 Build my iOS app, capture the home and settings screens in the simulator, frame them, and prepare them for upload.
 ```
 
+### asc-screenshot-resize
+
+Resize and validate App Store screenshots with current `asc screenshot-size` data and macOS `sips`.
+
+**Use when:**
+- You need to prepare or fix screenshots for App Store Connect submission
+- You want to resize images to the exact accepted dimensions for a device
+- You need to validate screenshot sizes before upload
+
+**Example:**
+
+```bash
+Resize my iPhone screenshots to the accepted App Store dimensions and flag any that are the wrong size.
+```
+
 ### asc-release-flow
 
 Readiness-first App Store submission guidance, including `asc validate`, `asc release stage`, `asc review submit`, and first-time release blockers.
