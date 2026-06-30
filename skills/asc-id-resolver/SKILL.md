@@ -12,7 +12,7 @@ Use this skill to map names to IDs needed by other commands.
   - `asc apps list --bundle-id "com.example.app"`
   - `asc apps list --name "My App"`
 - Fetch everything:
-  - `asc apps --paginate`
+  - `asc apps list --paginate`
 - Set default:
   - `ASC_APP_ID=...`
 
