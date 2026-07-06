@@ -100,7 +100,7 @@ asc web apps availability create \
   --available-in-new-territories true
 ```
 
-Use the experimental web flow above only for the first availability bootstrap. If app availability already exists, switch to `asc pricing availability edit --app "APP_ID" ...` for later territory changes.
+Use the web-session flow above only for the first availability bootstrap. If app availability already exists, switch to `asc pricing availability edit --app "APP_ID" ...` for later territory changes.
 
 ## Known UI Automation Issues
 

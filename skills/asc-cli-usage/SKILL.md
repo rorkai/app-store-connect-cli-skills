@@ -18,8 +18,9 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 - Use `asc schema` to inspect bundled App Store Connect endpoint schemas and request/query fields before designing API-facing commands.
   - `asc schema --pretty "GET /v1/apps"`
   - `asc schema --method POST appStoreVersions`
-- Use `asc capabilities` to explain CLI-supported, partial, web-only, and public-API-limited workflow coverage.
+- Use `asc capabilities` to explain CLI-supported, partial, web-session, and public-API-limited workflow coverage.
   - `asc capabilities --area release --output table`
+  - `asc capabilities --status web-session --output table`
   - `asc capabilities --status not-public-api --output markdown`
 
 ## Canonical verbs (current asc)
@@ -49,7 +50,7 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 - Fallback env vars: `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_PRIVATE_KEY_PATH`, `ASC_PRIVATE_KEY`, `ASC_PRIVATE_KEY_B64`.
 - `ASC_APP_ID` can provide a default app ID.
 - When permissions are unclear, inspect exact API key role coverage with `asc web auth capabilities`.
-  - This lives under the experimental web auth surface.
+  - This lives under the web-session auth surface.
   - It can resolve the current local auth by default, or inspect a specific key with `--key-id`.
 
 ## Apple Ads

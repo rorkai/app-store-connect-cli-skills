@@ -12,7 +12,7 @@ Use this skill when the question is "Can my app be submitted now?" or when the u
 - Resolve `APP_ID`, version string, `VERSION_ID` when needed, and `BUILD_ID` up front.
 - Ensure auth is configured with `asc auth login` or `ASC_*` environment variables.
 - Have canonical metadata in `./metadata` when using metadata-driven staging.
-- Treat `asc web ...` commands as optional experimental escape hatches for flows not covered by the public API.
+- Treat `asc web ...` commands as optional web-session fallbacks for flows not covered by the public API.
 
 ## Answer order
 
@@ -25,7 +25,7 @@ Blockers usually fall into:
 
 - API-fixable: build validity, metadata, screenshots, review details, content rights, encryption, version/build attachment, IAP readiness, Game Center version and review-submission items.
 - Web-session-fixable: initial app availability bootstrap, first-review subscription attachment, App Privacy publish state.
-- Manual fallback: first-time IAP selection on the app-version page when no CLI attach flow exists, or any flow the user does not want to run through experimental web-session commands.
+- Manual fallback: first-time IAP selection on the app-version page when no CLI attach flow exists, or any flow the user does not want to run through web-session commands.
 
 ## Canonical current path
 
@@ -123,7 +123,7 @@ Check:
 asc pricing availability view --app "APP_ID"
 ```
 
-Bootstrap the first availability record with the experimental web-session flow:
+Bootstrap the first availability record with the web-session flow:
 
 ```bash
 asc web apps availability create \
@@ -202,13 +202,13 @@ asc iap submit --iap-id "IAP_ID" --confirm
 
 For the first IAP on an app, or the first time adding a new IAP type, Apple may require selecting the IAP from the app version's "In-App Purchases and Subscriptions" section before submitting the app version. Prepare the IAP with localization, pricing, and review screenshot data first.
 
-For non-renewing IAPs that must be attached to the next app version review, the public API may reject the review item path. The CLI exposes an experimental web-session escape hatch that mirrors the App Store Connect web flow:
+For non-renewing IAPs that must be attached to the next app version review, the public API may reject the review item path. The CLI exposes a web-session fallback that mirrors the App Store Connect web flow:
 
 ```bash
 asc web review iaps attach --app "APP_ID" --iap-id "IAP_ID" --confirm
 ```
 
-Use this only for the web-only first-version selection gap, and call out that it uses unofficial Apple web-session endpoints.
+Use this only for the web-only first-version selection gap, and call out that it requires an authenticated Apple web session.
 
 ### Game Center needs app-version and review-submission items
 
@@ -239,7 +239,7 @@ asc web privacy apply --app "APP_ID" --file "./privacy.json"
 asc web privacy publish --app "APP_ID" --confirm
 ```
 
-If the user avoids experimental web-session commands, confirm App Privacy manually in App Store Connect:
+If the user avoids web-session commands, confirm App Privacy manually in App Store Connect:
 
 ```text
 https://appstoreconnect.apple.com/apps/APP_ID/appPrivacy
