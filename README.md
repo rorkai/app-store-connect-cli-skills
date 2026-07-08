@@ -20,6 +20,16 @@ Or install directly from GitHub:
 npx skills add rorkai/app-store-connect-cli-skills
 ```
 
+For Autohand Code, copy the skills you need into the current project:
+
+```bash
+mkdir -p .autohand/skills
+cp -R skills/asc-cli-usage .autohand/skills/
+```
+
+Autohand Code user skills live under `~/.autohand/skills/`; project skills live
+under `<project>/.autohand/skills/`.
+
 ## Available Skills
 
 ### asc-cli-usage
