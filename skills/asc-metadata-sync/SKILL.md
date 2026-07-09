@@ -68,6 +68,17 @@ asc metadata apply --app "APP_ID" --version "1.2.3" --platform IOS --dir "./meta
 asc metadata apply --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata"
 ```
 
+For a review-artifact workflow with explicit approval before mutation, use the metadata review commands introduced in `asc` 2.6.1:
+
+```bash
+asc metadata plan --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata" --review-dir ".asc/metadata/review"
+asc metadata approve --review-dir ".asc/metadata/review" --all
+asc metadata status --review-dir ".asc/metadata/review" --output table
+asc metadata apply --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata" --review-dir ".asc/metadata/review" --confirm
+```
+
+Use `asc metadata approve --key "version:en-US:whatsNew"` or `--scope app-info,version` when the user wants selective approval artifacts before the guarded apply.
+
 ## Keyword-only workflow
 
 Use this when only the version-localization `keywords` field should change:
@@ -150,6 +161,7 @@ asc migrate import --app "APP_ID" --version-id "VERSION_ID" --fastlane-dir "./fa
 - Start with `asc metadata pull` unless the user specifically asks for `.strings` or fastlane metadata.
 - Always run `asc metadata validate` before remote writes.
 - Preview remote changes with `--dry-run` when the command supports it.
+- Use `asc metadata plan` plus `approve`/`status` when the user wants a durable review artifact before apply.
 - For quick edits, always pass `--version-id` or `--version` plus `--platform`; do not rely on ambiguous latest-version behavior.
 - Keep app-info fields and version fields separate.
 - Use `--output table` for human verification and JSON for automation.
