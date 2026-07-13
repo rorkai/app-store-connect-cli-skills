@@ -93,18 +93,30 @@ Suggested entitlement policy:
 
 ### Step D - Ensure missing ASC items (if requested)
 
-Create missing ASC resources first, then re-read ASC to capture canonical IDs.
+Create or complete ASC resources first, then re-read ASC to capture canonical
+IDs. A RevenueCat product mapping is not proof that the corresponding ASC
+subscription is review-ready.
 
 ```bash
 # create subscription group
 asc subscriptions groups create --app "APP_ID" --reference-name "Premium"
 
-# create subscription
-asc subscriptions create \
-  --group-id "GROUP_ID" \
+# create or converge a review-ready subscription in one workflow
+asc subscriptions setup \
+  --app "APP_ID" \
+  --group-reference-name "Premium" \
+  --group-locale "en-US" \
+  --group-display-name "Premium" \
   --reference-name "Monthly" \
   --product-id "com.example.premium.monthly" \
-  --subscription-period ONE_MONTH
+  --subscription-period ONE_MONTH \
+  --locale "en-US" \
+  --display-name "Premium Monthly" \
+  --description "Unlock all premium features." \
+  --review-screenshot "./review.png" \
+  --price "3.99" \
+  --price-territory "USA" \
+  --territories "USA"
 
 # create iap
 asc iap create \
@@ -113,6 +125,29 @@ asc iap create \
   --ref-name "Lifetime" \
   --product-id "com.example.lifetime"
 ```
+
+`subscriptions setup` must finish the ASC metadata that RevenueCat cannot:
+group localization, subscription localization, App Review screenshot delivery,
+the complete App Store price matrix, and sale availability. Keep sale
+availability scoped to the requested territories; pricing still needs Apple's
+complete equalized territory matrix.
+
+If an existing API-created subscription remains `MISSING_METADATA` even though
+the selected base price is unchanged, re-run the same setup inputs with
+`--repair`. Repair atomically rebuilds and re-saves the complete equalized price
+matrix; it is not a duplicate single-price POST.
+
+After every ASC create, update, or repair, require this final gate before
+creating or attaching the RevenueCat product:
+
+```bash
+asc validate subscriptions --app "APP_ID" --output json --pretty
+```
+
+Do not treat setup as successful if Apple still reports `MISSING_METADATA`, the
+review screenshot is not `COMPLETE`, or the validator reports incomplete or
+unverified pricing coverage. Preserve the validator JSON in the final audit
+evidence.
 
 ### Step E - Ensure RevenueCat app and products
 
@@ -179,12 +214,14 @@ Failures:
 - Use full pagination (`--paginate` for ASC, `starting_after` for RevenueCat tools).
 - Continue processing after per-item failures and report all failures together.
 - Never auto-delete ASC or RevenueCat resources in this skill.
+- After ASC subscription writes, run `asc validate subscriptions --app "APP_ID" --output json --pretty` and block RevenueCat attachment for subscriptions with unresolved ASC blockers.
 
 ## Common pitfalls
 - Wrong RevenueCat `project_id` or app ID.
 - Creating RC products under the wrong platform app.
 - Accidentally assigning consumables to entitlements.
 - Skipping the post-create ASC re-read step.
+- Mapping a RevenueCat product before ASC setup finishes localization, review screenshot delivery, the complete price matrix, and availability.
 - Missing offering/package verification after product creation.
 
 ## Additional resources
