@@ -141,21 +141,26 @@ After every ASC subscription create, update, or repair, require this final gate
 before creating or attaching the RevenueCat subscription product:
 
 ```bash
-asc validate subscriptions --app "APP_ID" --output json --pretty
+mkdir -p "./audit"
+asc validate subscriptions --app "APP_ID" --output json --pretty \
+  > "./audit/subscriptions-validation.json"
 ```
 
 After every ASC IAP create or update, require the IAP gate in strict mode so
 warnings also block the RevenueCat product mapping:
 
 ```bash
-asc validate iap --app "APP_ID" --strict --output json --pretty
+mkdir -p "./audit"
+asc validate iap --app "APP_ID" --strict --output json --pretty \
+  > "./audit/iap-validation.json"
 ```
 
 Do not treat setup as successful if Apple still reports `MISSING_METADATA`, the
 review screenshot is not `COMPLETE`, or the validator reports incomplete or
 unverified pricing coverage. Do not attach an IAP while its strict validator
-reports warnings or errors. Preserve both validator JSON outputs in the final
-audit evidence.
+reports warnings or errors. Direct redirection preserves each validator's exit
+status. Retain `./audit/subscriptions-validation.json` and
+`./audit/iap-validation.json` as final audit evidence.
 
 ### Step E - Ensure RevenueCat app and products
 
@@ -222,8 +227,8 @@ Failures:
 - Use full pagination (`--paginate` for ASC, `starting_after` for RevenueCat tools).
 - Continue processing after per-item failures and report all failures together.
 - Never auto-delete ASC or RevenueCat resources in this skill.
-- After ASC subscription writes, run `asc validate subscriptions --app "APP_ID" --output json --pretty` and block RevenueCat attachment for subscriptions with unresolved ASC blockers.
-- After ASC IAP writes, run `asc validate iap --app "APP_ID" --strict --output json --pretty` and block RevenueCat attachment if it exits non-zero.
+- After ASC subscription writes, run `asc validate subscriptions --app "APP_ID" --output json --pretty`, save its JSON, and block RevenueCat attachment for subscriptions with unresolved ASC blockers.
+- After ASC IAP writes, run `asc validate iap --app "APP_ID" --strict --output json --pretty`, save its JSON, and block RevenueCat attachment if it exits non-zero.
 
 ## Common pitfalls
 - Wrong RevenueCat `project_id` or app ID.
