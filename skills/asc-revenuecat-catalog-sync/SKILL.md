@@ -137,17 +137,25 @@ the selected base price is unchanged, re-run the same setup inputs with
 `--repair`. Repair atomically rebuilds and re-saves the complete equalized price
 matrix; it is not a duplicate single-price POST.
 
-After every ASC create, update, or repair, require this final gate before
-creating or attaching the RevenueCat product:
+After every ASC subscription create, update, or repair, require this final gate
+before creating or attaching the RevenueCat subscription product:
 
 ```bash
 asc validate subscriptions --app "APP_ID" --output json --pretty
 ```
 
+After every ASC IAP create or update, require the IAP gate in strict mode so
+warnings also block the RevenueCat product mapping:
+
+```bash
+asc validate iap --app "APP_ID" --strict --output json --pretty
+```
+
 Do not treat setup as successful if Apple still reports `MISSING_METADATA`, the
 review screenshot is not `COMPLETE`, or the validator reports incomplete or
-unverified pricing coverage. Preserve the validator JSON in the final audit
-evidence.
+unverified pricing coverage. Do not attach an IAP while its strict validator
+reports warnings or errors. Preserve both validator JSON outputs in the final
+audit evidence.
 
 ### Step E - Ensure RevenueCat app and products
 
@@ -215,6 +223,7 @@ Failures:
 - Continue processing after per-item failures and report all failures together.
 - Never auto-delete ASC or RevenueCat resources in this skill.
 - After ASC subscription writes, run `asc validate subscriptions --app "APP_ID" --output json --pretty` and block RevenueCat attachment for subscriptions with unresolved ASC blockers.
+- After ASC IAP writes, run `asc validate iap --app "APP_ID" --strict --output json --pretty` and block RevenueCat attachment if it exits non-zero.
 
 ## Common pitfalls
 - Wrong RevenueCat `project_id` or app ID.
