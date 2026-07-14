@@ -21,7 +21,7 @@ Prefer the current high-level flows:
 ## Subscription PPP workflow
 
 ### New subscription: bootstrap with `setup`
-Use `setup` when you are creating a new subscription and want to create the group, subscription, first localization, initial price, and availability in one verified flow.
+Use `setup` when you are creating a new subscription and want one verified flow for the group, localizations, App Review screenshot, complete equalized price matrix, and sale availability. The sale territories remain an independently selected subset of the full price matrix.
 
 ```bash
 asc subscriptions setup \
@@ -40,9 +40,10 @@ asc subscriptions setup \
 ```
 
 Notes:
-- `setup` verifies the created state by default.
+- `setup` materializes Apple's complete equalized price matrix from the selected base price, then verifies the final state by default.
 - Use `--no-verify` only when you explicitly want speed over readback verification.
 - Use `--tier` or `--price-point-id` instead of `--price` when your workflow is tier-driven.
+- If an existing subscription remains `MISSING_METADATA` with the same selected base price, re-run the setup inputs with `--repair` to atomically rebuild and re-save the matrix.
 
 ### Inspect current subscription pricing before changes
 Use the summary view first when you want a compact current-state snapshot.
@@ -226,7 +227,7 @@ For future-dated schedules, expect scheduled changes rather than an immediately 
 
 ## Notes
 - Prefer canonical commands in docs and automation: `asc subscriptions pricing ...`
-- Older `asc subscriptions prices ...` paths still exist, but the canonical pricing family is clearer.
+- `asc subscriptions pricing ...` is the supported subscription pricing family; do not use the removed `asc subscriptions prices ...` path.
 - Prefer canonical IAP commands in docs and automation: `asc iap pricing ...`
 - `asc subscriptions pricing prices import --dry-run` is the safest subscription batch PPP path today.
 - `asc subscriptions setup` and `asc iap setup` already provide built-in post-create verification.
