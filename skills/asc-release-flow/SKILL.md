@@ -1,6 +1,6 @@
 ---
 name: asc-release-flow
-description: Determine whether an app is ready to submit, then drive the current App Store release flow with asc, including validation, staging, review submission, first-time availability, subscriptions, IAP, Game Center, and App Privacy checks.
+description: Determine whether an app is ready to submit, then drive the current App Store release flow with asc, including validation, staging, review submission, first-time availability, versioned subscriptions and IAPs, Game Center, and App Privacy checks.
 ---
 
 # Release flow (readiness-first)
@@ -177,10 +177,28 @@ asc web review subscriptions attach \
   --confirm
 ```
 
-For later reviews, submit subscriptions through the public review path:
+The legacy product-scoped public review shortcut remains available:
 
 ```bash
 asc subscriptions review submit --subscription-id "SUB_ID" --confirm
+```
+
+For an API 4.4.1 subscription version, prepare the version-scoped metadata and
+add that version—not the subscription product—to a review submission:
+
+```bash
+asc subscriptions versions create --subscription-id "SUB_ID"
+asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium" --description "Premium access"
+asc subscriptions versions images upload --version-id "SUBSCRIPTION_VERSION_ID" --file "./review.png"
+asc review items add --submission "SUBMISSION_ID" --item-type subscriptionVersions --item-id "SUBSCRIPTION_VERSION_ID"
+```
+
+Subscription group versions follow the same review-item model:
+
+```bash
+asc subscriptions groups versions create --group-id "GROUP_ID"
+asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
+asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupVersions --item-id "GROUP_VERSION_ID"
 ```
 
 ### In-app purchases need review readiness or first-version inclusion
@@ -195,10 +213,20 @@ Upload missing review screenshots:
 asc iap review-screenshots create --iap-id "IAP_ID" --file "./review.png"
 ```
 
-For IAPs on a published app:
+The legacy product-scoped submission shortcut remains available:
 
 ```bash
 asc iap submit --iap-id "IAP_ID" --confirm
+```
+
+For an API 4.4.1 IAP version, use its version ID throughout the v2 metadata,
+image, and review flow:
+
+```bash
+asc iap versions create --iap-id "IAP_ID"
+asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Premium" --description "Unlock premium features"
+asc iap versions images create --version-id "IAP_VERSION_ID" --file "./review.png"
+asc iap versions submit --version-id "IAP_VERSION_ID" --submission "SUBMISSION_ID" --confirm
 ```
 
 For the first IAP on an app, or the first time adding a new IAP type, Apple may require selecting the IAP from the app version's "In-App Purchases and Subscriptions" section before submitting the app version. Prepare the IAP with localization, pricing, and review screenshot data first.
@@ -224,6 +252,9 @@ If Game Center component versions must ship with the app version, use the explic
 asc review submissions-create --app "APP_ID" --platform IOS
 asc review items add --submission "SUBMISSION_ID" --item-type appStoreVersions --item-id "VERSION_ID"
 asc review items add --submission "SUBMISSION_ID" --item-type gameCenterLeaderboardVersions --item-id "GC_LEADERBOARD_VERSION_ID"
+asc review items add --submission "SUBMISSION_ID" --item-type inAppPurchaseVersions --item-id "IAP_VERSION_ID"
+asc review items add --submission "SUBMISSION_ID" --item-type subscriptionVersions --item-id "SUBSCRIPTION_VERSION_ID"
+asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupVersions --item-id "GROUP_VERSION_ID"
 asc review submissions-submit --id "SUBMISSION_ID" --confirm
 ```
 

@@ -146,10 +146,11 @@ Set up signing for com.example.app with iCloud enabled, a distribution certifica
 
 ### asc-id-resolver
 
-Resolve IDs for apps, builds, versions, groups, and testers.
+Resolve IDs for apps, builds, app and digital-goods versions, groups, and testers.
 
 **Use when:**
 - A command requires IDs and you only have names
+- You need an API 4.4.1 IAP, subscription, or subscription-group version ID
 - You want deterministic outputs for automation
 
 **Example:**
@@ -278,7 +279,8 @@ Update my subscription pricing for India, Brazil, and Mexico using a PPP-style r
 
 ### asc-subscription-localization
 
-Bulk-localize subscription and IAP display names across all App Store locales.
+Bulk-localize subscription and IAP display names across all App Store locales,
+including API 4.4.1 version-scoped v2 resources.
 
 **Use when:**
 - You want to set the same subscription display name in every language at once
