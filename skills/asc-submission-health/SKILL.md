@@ -76,7 +76,26 @@ asc apps content-rights view --app "APP_ID"
 asc apps content-rights edit --app "APP_ID" --uses-third-party-content=false
 ```
 
-### 5. Version metadata and localizations
+### 5. Age rating declaration
+
+Inspect the current declaration before editing it:
+
+```bash
+asc age-rating view --app "APP_ID" --output table
+```
+
+API 4.4.1 adds declarations for advertising, age assurance, health or wellness,
+messaging and chat, parental controls, social media, and age-restricted social
+media. Set only values that accurately describe the app:
+
+```bash
+asc age-rating edit --app "APP_ID" --advertising false --age-assurance false --health-or-wellness-topics false --messaging-and-chat false --parental-controls false --social-media false --social-media-age-restricted false
+```
+
+Prefer `--age-rating-override-v2` when an override is required; the original
+`--age-rating-override` flag is deprecated.
+
+### 6. Version metadata and localizations
 
 ```bash
 asc versions view --version-id "VERSION_ID" --include-build --include-submission
@@ -92,7 +111,7 @@ asc metadata push --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metad
 asc metadata push --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata"
 ```
 
-### 6. App info localizations and privacy policy
+### 7. App info localizations and privacy policy
 
 ```bash
 asc apps info list --app "APP_ID" --output table
@@ -105,7 +124,7 @@ For subscription or IAP apps, make sure privacy policy URL is populated:
 asc app-setup info set --app "APP_ID" --primary-locale "en-US" --privacy-policy-url "https://example.com/privacy"
 ```
 
-### 7. Screenshots
+### 8. Screenshots
 
 ```bash
 asc screenshots list --version-localization "LOC_ID" --output table
@@ -113,7 +132,7 @@ asc screenshots sizes --output table
 asc screenshots validate --path "./screenshots" --device-type "IPHONE_65" --output table
 ```
 
-### 8. Digital goods readiness
+### 9. Digital goods readiness
 
 ```bash
 asc validate iap --app "APP_ID" --output table
@@ -126,7 +145,16 @@ Use JSON when you need exact diagnostics:
 asc validate subscriptions --app "APP_ID" --output json --pretty
 ```
 
-### 9. App Privacy advisory
+When the product uses API 4.4.1 version-scoped metadata, inspect the exact
+version resources that will be submitted:
+
+```bash
+asc iap versions list --iap-id "IAP_ID" --paginate --output table
+asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output table
+asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output table
+```
+
+### 10. App Privacy advisory
 
 The public API cannot fully verify App Privacy publish state. If validation reports an advisory, use the web-session flow or confirm manually.
 
@@ -173,6 +201,9 @@ Use the lower-level review-submission API when the submission needs multiple rev
 asc review submissions-create --app "APP_ID" --platform IOS
 asc review items add --submission "SUBMISSION_ID" --item-type appStoreVersions --item-id "VERSION_ID"
 asc review items add --submission "SUBMISSION_ID" --item-type gameCenterChallengeVersions --item-id "GC_CHALLENGE_VERSION_ID"
+asc review items add --submission "SUBMISSION_ID" --item-type inAppPurchaseVersions --item-id "IAP_VERSION_ID"
+asc review items add --submission "SUBMISSION_ID" --item-type subscriptionVersions --item-id "SUBSCRIPTION_VERSION_ID"
+asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupVersions --item-id "GROUP_VERSION_ID"
 asc review submissions-submit --id "SUBMISSION_ID" --confirm
 ```
 

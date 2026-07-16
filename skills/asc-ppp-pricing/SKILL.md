@@ -116,7 +116,15 @@ Use price-point lookup and equalizations when you want to inspect Apple's locali
 ```bash
 asc subscriptions pricing price-points list --subscription-id "SUB_ID" --territory "USA" --paginate --price "9.99"
 asc subscriptions pricing price-points equalizations --price-point-id "PRICE_POINT_ID" --paginate
+asc subscriptions pricing price-points adjusted-equalizations --price-point-id "PRICE_POINT_ID" --subscription-id "SUB_ID" --plan-type MONTHLY --paginate
 ```
+
+Use `equalizations` for Apple's standard localized ladder. Use
+`adjusted-equalizations` when you need the API 4.4.1 subscription-specific
+adjustments, optionally filtered by `--subscription-id`, `--territory`,
+`--plan-type MONTHLY`, or `--upfront-price-point-id`. Treat `--next` as an
+opaque continuation URL: do not combine it with filters, sparse fields,
+includes, or limits.
 
 ### Verify after apply
 Re-run the summary and raw list views after changes.

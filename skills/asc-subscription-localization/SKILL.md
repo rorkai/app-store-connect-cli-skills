@@ -1,6 +1,6 @@
 ---
 name: asc-subscription-localization
-description: Bulk-localize subscription and in-app purchase display names across all App Store locales using asc. Use when you want to fill in subscription/IAP names for every language without clicking through App Store Connect manually.
+description: Bulk-localize subscription, subscription-group, and in-app purchase display names across App Store locales using asc, including API 4.4.1 version-scoped v2 resources. Use when filling or updating subscription/IAP names and descriptions without App Store Connect UI work.
 ---
 
 # asc subscription localization
@@ -11,6 +11,34 @@ Use this skill to bulk-create or bulk-update display names (and descriptions) fo
 - Auth configured (`asc auth login` or `ASC_*` env vars).
 - Know your app ID (`ASC_APP_ID` or `--app`).
 - Subscription groups and subscriptions already exist.
+
+## Choose the API scope first
+
+API 4.4.1 adds discrete versions for IAPs, subscriptions, and subscription
+groups. A version ID is different from its product, subscription, or group ID.
+
+- Use `asc ... versions localizations ...` when the localization belongs to a
+  version and must participate in that version's review lifecycle.
+- Use the existing `asc subscriptions localizations`,
+  `asc subscriptions groups localizations`, and `asc iap localizations`
+  commands only for the stable v1 product- or group-scoped resources.
+- Never pass a product, subscription, or group ID to a version-scoped command.
+
+Resolve or create versions before localizing them:
+
+```bash
+asc iap versions list --iap-id "IAP_ID" --paginate --output table
+asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output table
+asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output table
+```
+
+Create a version only when the requested review lifecycle needs a new one:
+
+```bash
+asc iap versions create --iap-id "IAP_ID"
+asc subscriptions versions create --subscription-id "SUB_ID"
+asc subscriptions groups versions create --group-id "GROUP_ID"
+```
 
 ## Supported App Store Locales
 
@@ -23,7 +51,49 @@ ja, ko, ms, nl-NL, no, pl, pt-BR, pt-PT, ro, ru, sk,
 sv, th, tr, uk, vi, zh-Hans, zh-Hant
 ```
 
-## Workflow: Bulk-Localize a Subscription
+## Workflow: Bulk-localize a subscription version (v2)
+
+List existing localizations, create only missing locales, then verify:
+
+```bash
+asc subscriptions versions localizations list --version-id "VERSION_ID" --paginate --output table
+asc subscriptions versions localizations create --version-id "VERSION_ID" --locale "LOCALE" --name "Display Name" --description "Description"
+asc subscriptions versions localizations list --version-id "VERSION_ID" --paginate --output table
+```
+
+Updates distinguish omitted values, strings (including an empty string), and
+JSON `null`:
+
+```bash
+asc subscriptions versions localizations update --id "LOC_ID" --name "New Name" --description ""
+asc subscriptions versions localizations update --id "LOC_ID" --clear-description
+```
+
+Do not combine a value flag with its matching `--clear-name` or
+`--clear-description` flag.
+
+## Workflow: Bulk-localize a subscription group version (v2)
+
+```bash
+asc subscriptions groups versions localizations list --version-id "VERSION_ID" --paginate --output table
+asc subscriptions groups versions localizations create --version-id "VERSION_ID" --locale "LOCALE" --name "Group Display Name" --custom-app-name "My App"
+asc subscriptions groups versions localizations update --id "LOC_ID" --clear-custom-app-name
+asc subscriptions groups versions localizations list --version-id "VERSION_ID" --paginate --output table
+```
+
+Use `--clear-name` or `--clear-custom-app-name` only when JSON `null` is
+intended; omission leaves the attribute unchanged.
+
+## Workflow: Bulk-localize an IAP version (v2)
+
+```bash
+asc iap versions localizations list --version-id "VERSION_ID" --paginate --output table
+asc iap versions localizations create --version-id "VERSION_ID" --locale "LOCALE" --name "Display Name" --description "Description"
+asc iap versions localizations update --localization-id "LOC_ID" --clear-description
+asc iap versions localizations list --version-id "VERSION_ID" --paginate --output table
+```
+
+## Legacy v1 workflow: Bulk-Localize a Subscription
 
 ### 1. Resolve IDs
 
@@ -104,7 +174,7 @@ asc subscriptions localizations create --subscription-id "SUB_ID" --locale "zh-H
 asc subscriptions localizations list --subscription-id "SUB_ID" --paginate --output table
 ```
 
-## Workflow: Bulk-Localize a Subscription Group
+## Legacy v1 workflow: Bulk-Localize a Subscription Group
 
 Subscription groups also have their own display name per locale (this is the "group name" shown to users in the subscription management sheet).
 
@@ -139,7 +209,7 @@ asc subscriptions groups localizations create \
 asc subscriptions groups localizations list --group-id "GROUP_ID" --paginate --output table
 ```
 
-## Workflow: Bulk-Localize an In-App Purchase
+## Legacy v1 workflow: Bulk-Localize an In-App Purchase
 
 IAPs have their own localization commands with the same pattern.
 
@@ -221,6 +291,9 @@ asc subscriptions list --group-id "GROUP_ID" --paginate
 
 ## Agent Behavior
 
+- Resolve whether the target is version-scoped v2 or legacy v1 before listing
+  or mutating localizations.
+- Keep version IDs separate from product, subscription, and group IDs.
 - Always list existing localizations first to avoid duplicate creation errors.
 - Skip locales that already have a localization; only create missing ones.
 - When the user provides a single display name, use it for all locales (same name everywhere).

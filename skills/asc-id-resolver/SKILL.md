@@ -1,6 +1,6 @@
 ---
 name: asc-id-resolver
-description: Resolve App Store Connect IDs (apps, builds, versions, groups, testers) from human-friendly names using asc. Use when commands require IDs.
+description: Resolve App Store Connect IDs (apps, builds, app and digital-goods versions, groups, testers) from human-friendly names using asc. Use when commands require IDs.
 ---
 
 # asc id resolver
@@ -24,6 +24,19 @@ Use this skill to map names to IDs needed by other commands.
 
 ## Version ID
 - `asc versions list --app "APP_ID" --paginate`
+
+## Digital-goods version IDs
+
+API 4.4.1 version IDs are distinct from IAP product, subscription, and
+subscription-group IDs:
+
+- IAP versions: `asc iap versions list --iap-id "IAP_ID" --paginate`
+- Subscription versions: `asc subscriptions versions list --subscription-id "SUB_ID" --paginate`
+- Subscription group versions: `asc subscriptions groups versions list --group-id "GROUP_ID" --paginate`
+
+Resolve child localization or image IDs from the corresponding version subtree:
+
+- `asc subscriptions versions localizations list --version-id "VERSION_ID" --paginate`
 
 ## TestFlight IDs
 - Groups:
