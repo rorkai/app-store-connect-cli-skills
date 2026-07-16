@@ -24,7 +24,7 @@ Use this skill when the question is "Can my app be submitted now?" or when the u
 Blockers usually fall into:
 
 - API-fixable: build validity, metadata, screenshots, review details, content rights, encryption, version/build attachment, IAP readiness, Game Center version and review-submission items.
-- Web-session-fixable: initial app availability bootstrap, first-review subscription attachment, App Privacy publish state.
+- Web-session-fixable: first-review subscription attachment and App Privacy publish state.
 - Manual fallback: first-time IAP selection on the app-version page when no CLI attach flow exists, or any flow the user does not want to run through web-session commands.
 
 ## Canonical current path
@@ -123,12 +123,13 @@ Check:
 asc pricing availability view --app "APP_ID"
 ```
 
-Bootstrap the first availability record with the web-session flow:
+Bootstrap the first availability record through the public API:
 
 ```bash
-asc web apps availability create \
+asc pricing availability create \
   --app "APP_ID" \
   --territory "USA,GBR" \
+  --available true \
   --available-in-new-territories true
 ```
 
