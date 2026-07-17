@@ -92,6 +92,11 @@ when they accurately describe the app:
 asc age-rating edit --app "APP_ID" --social-media false --social-media-age-restricted false
 ```
 
+Apple requires `userGeneratedContent=true` before `socialMedia` can be true.
+It also requires both `ageAssurance=true` and `socialMedia=true` before
+`socialMediaAgeRestricted` can be true. Inspect the current declaration before
+a partial edit, or set every prerequisite explicitly in the same command.
+
 Prefer `--age-rating-override-v2` when an override is required; the original
 `--age-rating-override` flag is deprecated.
 

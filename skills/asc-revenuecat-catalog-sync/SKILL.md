@@ -98,39 +98,57 @@ IDs. A RevenueCat product mapping is not proof that the corresponding ASC
 subscription is review-ready.
 
 ```bash
-# create subscription group
-asc subscriptions groups create --app "APP_ID" --reference-name "Premium"
+# create subscription group and capture .data.id as GROUP_ID
+asc subscriptions groups create --app "APP_ID" --reference-name "Premium" --output json
 
-# create or converge a review-ready subscription in one workflow
+# create or converge the subscription parent, screenshot, pricing, and availability
 asc subscriptions setup \
   --app "APP_ID" \
-  --group-reference-name "Premium" \
-  --group-locale "en-US" \
-  --group-display-name "Premium" \
+  --group-id "GROUP_ID" \
   --reference-name "Monthly" \
   --product-id "com.example.premium.monthly" \
   --subscription-period ONE_MONTH \
-  --locale "en-US" \
-  --display-name "Premium Monthly" \
-  --description "Unlock all premium features." \
   --review-screenshot "./review.png" \
   --price "3.99" \
   --price-territory "USA" \
-  --territories "USA"
+  --territories "USA" \
+  --no-verify \
+  --output json
+
+# capture .subscriptionId as SUB_ID, then create version-scoped metadata
+asc subscriptions groups versions create --group-id "GROUP_ID" --output json
+# capture .data.id as GROUP_VERSION_ID
+asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
+asc subscriptions versions create --subscription-id "SUB_ID" --output json
+# capture .data.id as SUBSCRIPTION_VERSION_ID
+asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium Monthly" --description "Unlock all premium features."
+asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
+asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
+asc validate subscriptions --app "APP_ID" --output table
 
 # create iap
 asc iap create \
   --app "APP_ID" \
   --type NON_CONSUMABLE \
   --ref-name "Lifetime" \
-  --product-id "com.example.lifetime"
+  --product-id "com.example.lifetime" \
+  --output json
+
+# capture .data.id as IAP_ID, then create version-scoped metadata
+asc iap versions create --iap-id "IAP_ID" --output json
+# capture .data.id as IAP_VERSION_ID
+asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock all premium features."
+asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output table
 ```
 
-`subscriptions setup` must finish the ASC metadata that RevenueCat cannot:
-group localization, subscription localization, App Review screenshot delivery,
-the complete App Store price matrix, and sale availability. Keep sale
-availability scoped to the requested territories; pricing still needs Apple's
-complete equalized territory matrix.
+`subscriptions setup` finishes the parent, App Review screenshot delivery,
+complete App Store price matrix, and sale availability. The version-scoped
+commands finish the group and subscription localizations that RevenueCat
+cannot. Keep sale availability scoped to the requested territories; pricing
+still needs Apple's complete equalized territory matrix. `--no-verify` is
+intentional in this split workflow because final verification must wait until
+the version metadata exists; the explicit readbacks and validator are the final
+gate.
 
 If an existing API-created subscription remains `MISSING_METADATA` even though
 the selected base price is unchanged, re-run the same setup inputs with

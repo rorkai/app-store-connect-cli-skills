@@ -17,11 +17,10 @@ Use this skill to bulk-create or bulk-update display names (and descriptions) fo
 API 4.4.1 adds discrete versions for IAPs, subscriptions, and subscription
 groups. A version ID is different from its product, subscription, or group ID.
 
-- Use `asc ... versions localizations ...` when the localization belongs to a
-  version and must participate in that version's review lifecycle.
-- Use the existing `asc subscriptions localizations`,
-  `asc subscriptions groups localizations`, and `asc iap localizations`
-  commands only for the stable v1 product- or group-scoped resources.
+- Use `asc ... versions localizations ...` for all new localization work.
+- Do not use the product- or group-scoped v1 localization commands. API 4.4.1
+  deprecates those resources, and the CLI now emits migration warnings for
+  their compatibility commands.
 - Never pass a product, subscription, or group ID to a version-scoped command.
 
 Resolve or create versions before localizing them:
@@ -35,10 +34,15 @@ asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output
 Create a version only when the requested review lifecycle needs a new one:
 
 ```bash
-asc iap versions create --iap-id "IAP_ID"
-asc subscriptions versions create --subscription-id "SUB_ID"
-asc subscriptions groups versions create --group-id "GROUP_ID"
+asc iap versions create --iap-id "IAP_ID" --output json
+asc subscriptions versions create --subscription-id "SUB_ID" --output json
+asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 ```
+
+None of the three version families has a version delete command. List and
+reuse an existing version when it matches the intended review lifecycle. Live
+parent deletion did not cascade IAP or subscription versions, so do not assume
+parent deletion cleans up versions created for testing.
 
 ## Supported App Store Locales
 
@@ -61,16 +65,17 @@ asc subscriptions versions localizations create --version-id "VERSION_ID" --loca
 asc subscriptions versions localizations list --version-id "VERSION_ID" --paginate --output table
 ```
 
-Updates distinguish omitted values, strings (including an empty string), and
-JSON `null`:
+Updates distinguish omitted values, non-empty strings, and JSON `null`:
 
 ```bash
-asc subscriptions versions localizations update --id "LOC_ID" --name "New Name" --description ""
-asc subscriptions versions localizations update --id "LOC_ID" --clear-description
+asc subscriptions versions localizations update --id "LOC_ID" --name "New Name" --description "Updated description"
 ```
 
 Do not combine a value flag with its matching `--clear-name` or
-`--clear-description` flag.
+`--clear-description` flag. The 4.4.1 schema permits JSON `null`, but Apple's
+live service currently rejects both an empty `--description` and
+`--clear-description` for subscription-version localizations because the
+description must contain at least one character.
 
 ## Workflow: Bulk-localize a subscription group version (v2)
 
@@ -89,210 +94,39 @@ intended; omission leaves the attribute unchanged.
 ```bash
 asc iap versions localizations list --version-id "VERSION_ID" --paginate --output table
 asc iap versions localizations create --version-id "VERSION_ID" --locale "LOCALE" --name "Display Name" --description "Description"
-asc iap versions localizations update --localization-id "LOC_ID" --clear-description
+asc iap versions localizations update --localization-id "LOC_ID" --description "Updated description"
 asc iap versions localizations list --version-id "VERSION_ID" --paginate --output table
 ```
 
-## Legacy v1 workflow: Bulk-Localize a Subscription
+Apple's live service also rejects empty descriptions and
+`--clear-description` for IAP-version localizations even though the 4.4.1
+schema permits JSON `null`.
 
-### 1. Resolve IDs
-
-```bash
-# Find subscription groups
-asc subscriptions groups list --app "APP_ID" --paginate --output table
-
-# Find subscriptions within a group
-asc subscriptions list --group-id "GROUP_ID" --paginate --output table
-```
-
-### 2. Check existing localizations
-
-```bash
-asc subscriptions localizations list --subscription-id "SUB_ID" --paginate --output table
-```
-
-This shows which locales already have a name set. Only create localizations for missing locales.
-
-### 3. Create localizations for all missing locales
-
-For each locale that does not already have a localization, run:
-
-```bash
-asc subscriptions localizations create \
-  --subscription-id "SUB_ID" \
-  --locale "LOCALE" \
-  --name "Display Name"
-```
-
-For example, to set "Monthly Pro" across all locales:
-
-```bash
-# One command per locale (skip any that already exist)
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "ar-SA" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "ca" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "cs" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "da" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "de-DE" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "el" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "en-AU" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "en-CA" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "en-GB" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "es-ES" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "es-MX" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "fi" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "fr-CA" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "fr-FR" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "he" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "hi" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "hr" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "hu" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "id" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "it" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "ja" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "ko" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "ms" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "nl-NL" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "no" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "pl" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "pt-BR" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "pt-PT" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "ro" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "ru" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "sk" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "sv" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "th" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "tr" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "uk" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "vi" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "zh-Hans" --name "Monthly Pro"
-asc subscriptions localizations create --subscription-id "SUB_ID" --locale "zh-Hant" --name "Monthly Pro"
-```
-
-### 4. Verify
-
-```bash
-asc subscriptions localizations list --subscription-id "SUB_ID" --paginate --output table
-```
-
-## Legacy v1 workflow: Bulk-Localize a Subscription Group
-
-Subscription groups also have their own display name per locale (this is the "group name" shown to users in the subscription management sheet).
-
-### 1. Check existing group localizations
-
-```bash
-asc subscriptions groups localizations list --group-id "GROUP_ID" --paginate --output table
-```
-
-### 2. Create for missing locales
-
-```bash
-asc subscriptions groups localizations create \
-  --group-id "GROUP_ID" \
-  --locale "LOCALE" \
-  --name "Group Display Name"
-```
-
-Optional: set a custom app name for the group:
-
-```bash
-asc subscriptions groups localizations create \
-  --group-id "GROUP_ID" \
-  --locale "LOCALE" \
-  --name "Group Display Name" \
-  --custom-app-name "My App"
-```
-
-### 3. Verify
-
-```bash
-asc subscriptions groups localizations list --group-id "GROUP_ID" --paginate --output table
-```
-
-## Legacy v1 workflow: Bulk-Localize an In-App Purchase
-
-IAPs have their own localization commands with the same pattern.
-
-### 1. Resolve IAP ID
-
-```bash
-asc iap list --app "APP_ID" --output table
-```
-
-### 2. Check existing localizations
-
-```bash
-asc iap localizations list --iap-id "IAP_ID" --paginate --output table
-```
-
-### 3. Create for missing locales
-
-```bash
-asc iap localizations create \
-  --iap-id "IAP_ID" \
-  --locale "LOCALE" \
-  --name "Display Name"
-```
-
-Optional description:
-
-```bash
-asc iap localizations create \
-  --iap-id "IAP_ID" \
-  --locale "LOCALE" \
-  --name "Unlock All Features" \
-  --description "One-time purchase to unlock all premium features"
-```
-
-### 4. Verify
-
-```bash
-asc iap localizations list --iap-id "IAP_ID" --paginate --output table
-```
-
-## Updating Existing Localizations
-
-To change the display name for existing localizations:
-
-### Subscriptions
-```bash
-asc subscriptions localizations update --id "LOC_ID" --name "New Name"
-```
-
-### Subscription Groups
-```bash
-asc subscriptions groups localizations update --id "LOC_ID" --name "New Group Name"
-```
-
-### In-App Purchases
-```bash
-asc iap localizations update --localization-id "LOC_ID" --name "New Name"
-```
-
-To bulk-update, list existing localizations first, extract the IDs, then update each one.
-
-## Bulk-Localize All Subscriptions in an App
+## Bulk-localize all subscription versions in an app
 
 For a full app with multiple subscription groups and subscriptions:
 
 ```bash
-# 1. List all groups
-asc subscriptions groups list --app "APP_ID" --paginate
+# 1. List groups and resolve each group's current version.
+asc subscriptions groups list --app "APP_ID" --paginate --output json
+asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output json
 
-# 2. For each group, localize the group itself
-#    (repeat group localization workflow above)
+# 2. Localize each group version.
+asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
+asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "LOCALE" --name "Group Display Name"
 
-# 3. For each group, list subscriptions
-asc subscriptions list --group-id "GROUP_ID" --paginate
+# 3. List subscriptions and resolve each subscription's current version.
+asc subscriptions list --group-id "GROUP_ID" --paginate --output json
+asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output json
 
-# 4. For each subscription, localize it
-#    (repeat subscription localization workflow above)
+# 4. Localize each subscription version.
+asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
+asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "LOCALE" --name "Display Name" --description "Description"
 ```
 
 ## Agent Behavior
 
-- Resolve whether the target is version-scoped v2 or legacy v1 before listing
-  or mutating localizations.
+- Use only version-scoped v2 resources for new localization work.
 - Keep version IDs separate from product, subscription, and group IDs.
 - Always list existing localizations first to avoid duplicate creation errors.
 - Skip locales that already have a localization; only create missing ones.
