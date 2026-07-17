@@ -93,15 +93,20 @@ Suggested entitlement policy:
 
 ### Step D - Ensure missing ASC items (if requested)
 
-Create or complete ASC resources first, then re-read ASC to capture canonical
-IDs. A RevenueCat product mapping is not proof that the corresponding ASC
-subscription is review-ready.
+Resolve every parent and version before writing. Match groups by exact reference
+name and products by `productId`; never treat a display name as identity. Reuse
+the canonical ID when the resource already exists, and run a create command
+only when the fully paginated read proves it is missing. A RevenueCat product
+mapping is not proof that the corresponding ASC subscription is review-ready.
 
 ```bash
-# create subscription group and capture .data.id as GROUP_ID
+# Resolve GROUP_ID by exact referenceName. Create only if absent.
+asc subscriptions groups list --app "APP_ID" --paginate --output json
 asc subscriptions groups create --app "APP_ID" --reference-name "Premium" --output json
 
-# create or converge the subscription parent, screenshot, pricing, and availability
+# Resolve SUB_ID by exact productId within GROUP_ID. Run setup only for a missing
+# parent or an explicitly approved reconciliation of that same product ID.
+asc subscriptions list --group-id "GROUP_ID" --paginate --output json
 asc subscriptions setup \
   --app "APP_ID" \
   --group-id "GROUP_ID" \
@@ -115,18 +120,32 @@ asc subscriptions setup \
   --no-verify \
   --output json
 
-# capture .subscriptionId as SUB_ID, then create version-scoped metadata
+# Resolve the group version for the intended review lifecycle. Create only if
+# no suitable version exists; none of the version families has a delete command.
+asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output json
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
-# capture .data.id as GROUP_VERSION_ID
+
+# Resolve the en-US localization on GROUP_VERSION_ID. Create it only when
+# missing; update the resolved localization ID when its values differ.
+asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
+asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --name "Premium"
+
+# Resolve the subscription version for the intended review lifecycle. Create
+# only if no suitable version exists, then resolve its en-US localization.
+asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output json
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
-# capture .data.id as SUBSCRIPTION_VERSION_ID
+asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium Monthly" --description "Unlock all premium features."
+asc subscriptions versions localizations update --id "SUBSCRIPTION_LOC_ID" --name "Premium Monthly" --description "Unlock all premium features."
+
+# Read back the exact versions selected above, then run the final validator.
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc validate subscriptions --app "APP_ID" --output table
 
-# create iap
+# Resolve IAP_ID by exact productId. Create only if absent.
+asc iap list --app "APP_ID" --paginate --output json
 asc iap create \
   --app "APP_ID" \
   --type NON_CONSUMABLE \
@@ -134,12 +153,23 @@ asc iap create \
   --product-id "com.example.lifetime" \
   --output json
 
-# capture .data.id as IAP_ID, then create version-scoped metadata
+# Resolve the IAP version for the intended review lifecycle. Create only if no
+# suitable version exists, then create or update the resolved en-US localization.
+asc iap versions list --iap-id "IAP_ID" --paginate --output json
 asc iap versions create --iap-id "IAP_ID" --output json
-# capture .data.id as IAP_VERSION_ID
+asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock all premium features."
+asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Lifetime" --description "Unlock all premium features."
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output table
 ```
+
+Each adjacent create/update pair above is conditional, not a sequence to run
+blindly: create when the list has no match, update when the resolved match has
+different values, and do nothing when it already matches. Capture `.data.id`
+from a create response or `.data[].id` from the preceding list as the canonical
+ID used by later commands. Do not create a new version merely because a rerun
+already has one; parent deletion did not reliably cascade IAP or subscription
+versions in live testing.
 
 `subscriptions setup` finishes the parent, App Review screenshot delivery,
 complete App Store price matrix, and sale availability. The version-scoped
