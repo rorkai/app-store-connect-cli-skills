@@ -44,6 +44,9 @@ Goal: bootstrap both systems when store products are partially missing.
    before version metadata:
 
    ```bash
+   # CONDITIONAL PSEUDOCODE: audit each exact productId, then run only its branch.
+   # Monthly: zero matches -> create with setup; one -> reuse its SUB_ID or run
+   # these same inputs only for explicitly approved reconciliation; many -> stop.
    asc subscriptions setup \
      --app "APP_ID" \
      --group-id "GROUP_ID" \
@@ -57,6 +60,8 @@ Goal: bootstrap both systems when store products are partially missing.
      --no-verify \
      --output json
 
+   # Annual: zero matches -> create with setup; one -> reuse its SUB_ID or run
+   # these same inputs only for explicitly approved reconciliation; many -> stop.
    asc subscriptions setup \
      --app "APP_ID" \
      --group-id "GROUP_ID" \
