@@ -50,18 +50,26 @@ finish.
 
 ```bash
 asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+# If and only if the list has zero matches:
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
-# Capture GROUP_VERSION_ID from list .data[0].id or create .data.id.
+# For one match, reuse .data[0].id. For more than one, stop and require an explicit GROUP_VERSION_ID.
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
+# If and only if en-US is missing:
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Pro"
+# Otherwise, if and only if the resolved en-US name differs:
 asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --name "Pro"
+# Otherwise, do nothing.
 
 asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+# If and only if the list has zero matches:
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
-# Capture SUBSCRIPTION_VERSION_ID from list .data[0].id or create .data.id.
+# For one match, reuse .data[0].id. For more than one, stop and require an explicit SUBSCRIPTION_VERSION_ID.
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
+# If and only if en-US is missing:
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Pro Monthly" --description "Unlock everything"
+# Otherwise, if and only if the resolved en-US values differ:
 asc subscriptions versions localizations update --id "SUBSCRIPTION_LOC_ID" --name "Pro Monthly" --description "Unlock everything"
+# Otherwise, do nothing.
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc validate subscriptions --app "APP_ID" --output table
@@ -210,11 +218,15 @@ Capture `.iapId` from the setup JSON, then create the version and metadata:
 
 ```bash
 asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+# If and only if the list has zero matches:
 asc iap versions create --iap-id "IAP_ID" --output json
-# Capture IAP_VERSION_ID from list .data[0].id or create .data.id.
+# For one match, reuse .data[0].id. For more than one, stop and require an explicit IAP_VERSION_ID.
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
+# If and only if en-US is missing:
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Pro Lifetime" --description "Unlock everything forever"
+# Otherwise, if and only if the resolved en-US values differ:
 asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Pro Lifetime" --description "Unlock everything forever"
+# Otherwise, do nothing.
 ```
 
 Reuse the single `PREPARE_FOR_SUBMISSION` version. Create only when the list is

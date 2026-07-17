@@ -127,14 +127,14 @@ asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 # Resolve the en-US localization on GROUP_VERSION_ID. Create it only when
 # missing; update the resolved localization ID when its values differ.
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
-asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
+asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium" --output json
 asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --name "Premium"
 
 # Resolve the unique mutable subscription version for this review lifecycle.
 asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
-asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium Monthly" --description "Unlock all premium features."
+asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium Monthly" --description "Unlock all premium features." --output json
 asc subscriptions versions localizations update --id "SUBSCRIPTION_LOC_ID" --name "Premium Monthly" --description "Unlock all premium features."
 
 # Read back the exact versions selected above, then run the final validator.
@@ -155,7 +155,7 @@ asc iap create \
 asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc iap versions create --iap-id "IAP_ID" --output json
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
-asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock all premium features."
+asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock all premium features." --output json
 asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Lifetime" --description "Unlock all premium features."
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output table
 ```
