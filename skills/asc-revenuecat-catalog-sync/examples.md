@@ -133,15 +133,25 @@ Goal: model recommended entitlement behavior by product type.
    ```bash
    asc iap pricing summary --iap-id "LIFETIME_IAP_ID" --output json
    asc iap pricing availability view --iap-id "LIFETIME_IAP_ID" --output json
+   # On a successful parent view, capture .data.id, then:
+   asc iap pricing availabilities available-territories --id "LIFETIME_AVAILABILITY_ID" --paginate --output json
    asc iap pricing summary --iap-id "COINS_IAP_ID" --output json
    asc iap pricing availability view --iap-id "COINS_IAP_ID" --output json
+   # On a successful parent view, capture .data.id, then:
+   asc iap pricing availabilities available-territories --id "COINS_AVAILABILITY_ID" --paginate --output json
    ```
 
    Only an App Store Connect `404` from the pricing summary proves that a price
    schedule is absent. Stop and report authentication, transport, decoding, and
-   every other summary error. After confirmation, create a missing schedule or
-   set availability only when the corresponding successful read proves the
-   desired per-product value differs:
+   every other summary error. For availability, capture `.data.id` from each
+   successful parent view and use it for the fully paginated territory read. A
+   parent-view `404` means availability is missing; every other parent or
+   territory-read error stops that item. Do not infer the territory set from
+   parent-view relationship data because that relationship is optional and may
+   be paged. Compare the complete returned territory-ID set with that product's
+   complete approved set, ignoring order.
+   After confirmation, create a missing schedule or set availability only when
+   it is missing or that complete set differs:
 
    ```bash
    asc iap pricing schedules create --iap-id "LIFETIME_IAP_ID" --base-territory "USA" --prices "LIFETIME_PRICE_POINT_ID" --output json
@@ -209,8 +219,12 @@ Goal: make apply mode safe and repeatable in team workflows.
      missing image, reuse a proven match, and stop on a differing or ambiguous
      image because this no-delete workflow cannot replace it
    - read IAP pricing summary and availability separately; only a summary `404`
-     means no schedule, every other error stops that item, and availability is
-     set only when a successful read proves the approved territory set differs
+     means no schedule, and only an availability-parent `404` means missing
+     availability; every other error stops that item
+   - capture the availability ID, fully paginate
+     `asc iap pricing availabilities available-territories --id "AVAILABILITY_ID" --paginate --output json`,
+     and set availability only when it is missing or the complete approved and
+     current territory-ID sets differ
    - save and require a zero exit from `asc validate subscriptions --app "APP_ID" --strict --output json --pretty` and/or `asc validate iap --app "APP_ID" --strict --output json --pretty`
    - RC app/product, but only for items whose applicable ASC gate passed
    - RC entitlement + attachments
