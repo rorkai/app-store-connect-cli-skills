@@ -187,17 +187,25 @@ For an API 4.4.1 subscription version, prepare the version-scoped metadata and
 add that version—not the subscription product—to a review submission:
 
 ```bash
-asc subscriptions versions create --subscription-id "SUB_ID"
+asc subscriptions versions create --subscription-id "SUB_ID" --output json
+# Capture .data.id from the create response as SUBSCRIPTION_VERSION_ID.
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium" --description "Premium access"
-asc subscriptions versions images upload --version-id "SUBSCRIPTION_VERSION_ID" --file "./review.png"
+asc subscriptions versions images upload --version-id "SUBSCRIPTION_VERSION_ID" --file "./promotional.png"
+asc subscriptions versions view --id "SUBSCRIPTION_VERSION_ID" --output table
+asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
+asc subscriptions versions images primary --version-id "SUBSCRIPTION_VERSION_ID" --output table
+asc subscriptions versions images list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc review items add --submission "SUBMISSION_ID" --item-type subscriptionVersions --item-id "SUBSCRIPTION_VERSION_ID"
 ```
 
 Subscription group versions follow the same review-item model:
 
 ```bash
-asc subscriptions groups versions create --group-id "GROUP_ID"
+asc subscriptions groups versions create --group-id "GROUP_ID" --output json
+# Capture .data.id from the create response as GROUP_VERSION_ID.
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
+asc subscriptions groups versions view --version-id "GROUP_VERSION_ID" --output table
+asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupVersions --item-id "GROUP_VERSION_ID"
 ```
 
@@ -223,9 +231,14 @@ For an API 4.4.1 IAP version, use its version ID throughout the v2 metadata,
 image, and review flow:
 
 ```bash
-asc iap versions create --iap-id "IAP_ID"
+asc iap versions create --iap-id "IAP_ID" --output json
+# Capture .data.id from the create response as IAP_VERSION_ID.
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Premium" --description "Unlock premium features"
 asc iap versions images create --version-id "IAP_VERSION_ID" --file "./review.png"
+asc iap versions view --version-id "IAP_VERSION_ID" --output table
+asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output table
+asc iap versions image --version-id "IAP_VERSION_ID" --output table
+asc iap versions images list --version-id "IAP_VERSION_ID" --paginate --output table
 asc iap versions submit --version-id "IAP_VERSION_ID" --submission "SUBMISSION_ID" --confirm
 ```
 

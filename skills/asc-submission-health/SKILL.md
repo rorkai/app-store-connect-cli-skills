@@ -84,12 +84,12 @@ Inspect the current declaration before editing it:
 asc age-rating view --app "APP_ID" --output table
 ```
 
-API 4.4.1 adds declarations for advertising, age assurance, health or wellness,
-messaging and chat, parental controls, social media, and age-restricted social
-media. Set only values that accurately describe the app:
+API 4.4.1 adds the `socialMedia` and `socialMediaAgeRestricted` declarations;
+the other age-rating declarations predate this schema. Set the new values only
+when they accurately describe the app:
 
 ```bash
-asc age-rating edit --app "APP_ID" --advertising false --age-assurance false --health-or-wellness-topics false --messaging-and-chat false --parental-controls false --social-media false --social-media-age-restricted false
+asc age-rating edit --app "APP_ID" --social-media false --social-media-age-restricted false
 ```
 
 Prefer `--age-rating-override-v2` when an override is required; the original
@@ -150,9 +150,22 @@ version resources that will be submitted:
 
 ```bash
 asc iap versions list --iap-id "IAP_ID" --paginate --output table
+asc iap versions view --version-id "IAP_VERSION_ID" --output table
+asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output table
+asc iap versions image --version-id "IAP_VERSION_ID" --output table
+asc iap versions images list --version-id "IAP_VERSION_ID" --paginate --output table
 asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output table
+asc subscriptions versions view --id "SUBSCRIPTION_VERSION_ID" --output table
+asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
+asc subscriptions versions images primary --version-id "SUBSCRIPTION_VERSION_ID" --output table
+asc subscriptions versions images list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output table
+asc subscriptions groups versions view --version-id "GROUP_VERSION_ID" --output table
+asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 ```
+
+Capture each version `.data.id` from its create response before resolving or
+mutating these children.
 
 ### 10. App Privacy advisory
 

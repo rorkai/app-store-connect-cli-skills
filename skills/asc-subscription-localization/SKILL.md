@@ -99,10 +99,10 @@ asc iap versions localizations list --version-id "VERSION_ID" --paginate --outpu
 
 ```bash
 # Find subscription groups
-asc subscriptions groups list --app "APP_ID" --output table
+asc subscriptions groups list --app "APP_ID" --paginate --output table
 
 # Find subscriptions within a group
-asc subscriptions list --group-id "GROUP_ID" --output table
+asc subscriptions list --group-id "GROUP_ID" --paginate --output table
 ```
 
 ### 2. Check existing localizations
@@ -300,7 +300,8 @@ asc subscriptions list --group-id "GROUP_ID" --paginate
 - When the user provides translated names per locale, use the locale-specific name for each.
 - If a description is provided, pass `--description` on create. Otherwise omit it.
 - Use `--output table` for verification steps so the user can visually confirm.
-- Use default JSON output for intermediate automation steps.
+- Use explicit `--output json` for intermediate automation steps; output
+  defaults are TTY-aware.
 - After bulk creation, always run the list command to verify completeness.
 - For apps with many subscriptions, process them sequentially per group to keep output readable.
 - If a create call fails for a locale, log the locale and error, then continue with the remaining locales. After the batch completes, report all failures together so the user can address them.
