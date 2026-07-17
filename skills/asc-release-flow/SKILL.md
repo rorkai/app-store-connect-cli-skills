@@ -177,14 +177,14 @@ asc web review subscriptions attach \
   --confirm
 ```
 
-The legacy product-scoped public review shortcut remains available:
+The product-scoped `asc subscriptions review submit` shortcut is deprecated.
+Do not build new workflows around it.
 
-```bash
-asc subscriptions review submit --subscription-id "SUB_ID" --confirm
-```
-
-For an API 4.4.1 subscription version, prepare the version-scoped metadata and
-add that version—not the subscription product—to a review submission:
+The API 4.4.1 versioned workflow below is for a subsequent review or another
+existing review submission. It does not replace the web-session flow above for
+attaching a subscription or group to its first review. Prepare the
+version-scoped metadata and add that version—not the subscription product—to
+the existing submission:
 
 ```bash
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
@@ -198,7 +198,7 @@ asc subscriptions versions images list --version-id "SUBSCRIPTION_VERSION_ID" --
 asc review items add --submission "SUBMISSION_ID" --item-type subscriptionVersions --item-id "SUBSCRIPTION_VERSION_ID"
 ```
 
-Subscription group versions follow the same review-item model:
+Subscription group versions follow the same existing-submission model:
 
 ```bash
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
@@ -221,11 +221,8 @@ Upload missing review screenshots:
 asc iap review-screenshots create --iap-id "IAP_ID" --file "./review.png"
 ```
 
-The legacy product-scoped submission shortcut remains available:
-
-```bash
-asc iap submit --iap-id "IAP_ID" --confirm
-```
+The product-scoped `asc iap submit` shortcut is deprecated. Use the versioned
+workflow below for new review submissions.
 
 For an API 4.4.1 IAP version, use its version ID throughout the v2 metadata,
 image, and review flow:
