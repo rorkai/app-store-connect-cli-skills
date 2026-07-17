@@ -108,42 +108,50 @@ schema permits JSON `null`.
 For a full app with multiple subscription groups and subscriptions:
 
 ```bash
-# 1. List groups and resolve each group's current version.
+# 1. List groups and resolve each group's unique mutable version.
 asc subscriptions groups list --app "APP_ID" --paginate --output json
-asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output json
+asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 
 # 2. Localize each group version.
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "LOCALE" --name "Group Display Name"
 
-# 3. List subscriptions and resolve each subscription's current version.
+# 3. List subscriptions and resolve each subscription's unique mutable version.
 asc subscriptions list --group-id "GROUP_ID" --paginate --output json
-asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output json
+asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 
 # 4. Localize each subscription version.
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "LOCALE" --name "Display Name" --description "Description"
 ```
 
+Apply the same zero/one/many rule to each version list: create a version for
+zero matches, reuse the one match, and stop for an explicit ID when multiple
+matches are returned.
+
 ## Agent Behavior
 
 - Use only version-scoped v2 resources for new localization work.
 - Keep version IDs separate from product, subscription, and group IDs.
 - Always list existing localizations first to avoid duplicate creation errors.
-- Skip locales that already have a localization; only create missing ones.
+- Create a missing locale, update the resolved localization ID when existing
+  values differ, and do nothing when the existing values already match.
 - When the user provides a single display name, use it for all locales (same name everywhere).
 - When the user provides translated names per locale, use the locale-specific name for each.
 - If a description is provided, pass `--description` on create. Otherwise omit it.
 - Use `--output table` for verification steps so the user can visually confirm.
 - Use explicit `--output json` for intermediate automation steps; output
   defaults are TTY-aware.
-- After bulk creation, always run the list command to verify completeness.
+- After bulk writes, always run the list command to verify completeness.
 - For apps with many subscriptions, process them sequentially per group to keep output readable.
-- If a create call fails for a locale, log the locale and error, then continue with the remaining locales. After the batch completes, report all failures together so the user can address them.
+- If a create or update call fails for a locale, log the locale and error, then
+  continue with the remaining locales. After the batch completes, report all
+  failures together so the user can address them.
 
 ## Notes
 - Subscription display names are what users see on the subscription management sheet and in purchase dialogs.
-- Creating a localization for a locale that already exists will fail; always check first.
+- Creating a localization for a locale that already exists will fail; list
+  first and update the resolved ID when a change is needed.
 - There is no bulk API; each locale requires a separate create call.
 - Use `--paginate` on list commands to ensure all existing localizations are returned.
 - Use the `asc-id-resolver` skill if you only have app names instead of IDs.
