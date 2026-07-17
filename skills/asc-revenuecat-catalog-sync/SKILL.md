@@ -120,9 +120,8 @@ asc subscriptions setup \
   --no-verify \
   --output json
 
-# Resolve the group version for the intended review lifecycle. Create only if
-# no suitable version exists; none of the version families has a delete command.
-asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output json
+# Resolve the unique mutable group version for this review lifecycle.
+asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 
 # Resolve the en-US localization on GROUP_VERSION_ID. Create it only when
@@ -131,9 +130,8 @@ asc subscriptions groups versions localizations list --version-id "GROUP_VERSION
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
 asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --name "Premium"
 
-# Resolve the subscription version for the intended review lifecycle. Create
-# only if no suitable version exists, then resolve its en-US localization.
-asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output json
+# Resolve the unique mutable subscription version for this review lifecycle.
+asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium Monthly" --description "Unlock all premium features."
@@ -153,9 +151,8 @@ asc iap create \
   --product-id "com.example.lifetime" \
   --output json
 
-# Resolve the IAP version for the intended review lifecycle. Create only if no
-# suitable version exists, then create or update the resolved en-US localization.
-asc iap versions list --iap-id "IAP_ID" --paginate --output json
+# Resolve the unique mutable IAP version for this review lifecycle.
+asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc iap versions create --iap-id "IAP_ID" --output json
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock all premium features."
@@ -167,9 +164,11 @@ Each adjacent create/update pair above is conditional, not a sequence to run
 blindly: create when the list has no match, update when the resolved match has
 different values, and do nothing when it already matches. Capture `.data.id`
 from a create response or `.data[].id` from the preceding list as the canonical
-ID used by later commands. Do not create a new version merely because a rerun
-already has one; parent deletion did not reliably cascade IAP or subscription
-versions in live testing.
+ID used by later commands. For each version list, zero
+`PREPARE_FOR_SUBMISSION` matches means create, one means reuse that ID, and more
+than one means stop and require the user to choose an explicit version ID. Do
+not create a version to resolve ambiguity: parent deletion did not reliably
+cascade IAP or subscription versions in live testing.
 
 `subscriptions setup` finishes the parent, App Review screenshot delivery,
 complete App Store price matrix, and sale availability. The version-scoped

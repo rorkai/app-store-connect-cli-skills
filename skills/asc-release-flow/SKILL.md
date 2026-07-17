@@ -187,6 +187,7 @@ version-scoped metadata and add that version—not the subscription product—to
 the existing submission:
 
 ```bash
+asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
 # Capture .data.id from the create response as SUBSCRIPTION_VERSION_ID.
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium" --description "Premium access"
@@ -201,6 +202,7 @@ asc review items add --submission "SUBMISSION_ID" --item-type subscriptionVersio
 Subscription group versions follow the same existing-submission model:
 
 ```bash
+asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 # Capture .data.id from the create response as GROUP_VERSION_ID.
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
@@ -208,6 +210,10 @@ asc subscriptions groups versions view --version-id "GROUP_VERSION_ID" --output 
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupVersions --item-id "GROUP_VERSION_ID"
 ```
+
+For each list above, reuse its single `PREPARE_FOR_SUBMISSION` result. Create
+only when the result is empty; if multiple matches are returned, stop and
+require an explicit version ID.
 
 ### In-app purchases need review readiness or first-version inclusion
 
@@ -228,6 +234,7 @@ For an API 4.4.1 IAP version, use its version ID throughout the v2 metadata,
 image, and review flow:
 
 ```bash
+asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc iap versions create --iap-id "IAP_ID" --output json
 # Capture .data.id from the create response as IAP_VERSION_ID.
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Premium" --description "Unlock premium features"
@@ -238,6 +245,9 @@ asc iap versions image --version-id "IAP_VERSION_ID" --output table
 asc iap versions images list --version-id "IAP_VERSION_ID" --paginate --output table
 asc iap versions submit --version-id "IAP_VERSION_ID" --submission "SUBMISSION_ID" --confirm
 ```
+
+Reuse the single `PREPARE_FOR_SUBMISSION` version. Create only when the list is
+empty, and stop for an explicit version ID if multiple matches are returned.
 
 For the first IAP on an app, or the first time adding a new IAP type, Apple may require selecting the IAP from the app version's "In-App Purchases and Subscriptions" section before submitting the app version. Prepare the IAP with localization, pricing, and review screenshot data first.
 
