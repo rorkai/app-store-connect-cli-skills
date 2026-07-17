@@ -51,13 +51,17 @@ finish.
 ```bash
 asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
-# Capture .data.id as GROUP_VERSION_ID.
+# Capture GROUP_VERSION_ID from list .data[0].id or create .data.id.
+asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Pro"
+asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --name "Pro"
 
 asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
-# Capture .data.id as SUBSCRIPTION_VERSION_ID.
+# Capture SUBSCRIPTION_VERSION_ID from list .data[0].id or create .data.id.
+asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Pro Monthly" --description "Unlock everything"
+asc subscriptions versions localizations update --id "SUBSCRIPTION_LOC_ID" --name "Pro Monthly" --description "Unlock everything"
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc validate subscriptions --app "APP_ID" --output table
@@ -66,7 +70,9 @@ asc validate subscriptions --app "APP_ID" --output table
 For each version list, reuse its single `PREPARE_FOR_SUBMISSION` result. Create
 only when the result is empty; if more than one result is returned, stop and
 require an explicit version ID instead of creating another non-deletable
-version.
+version. Each localization create/update pair is also conditional: create for
+a missing locale, update the resolved localization only when values differ,
+and do nothing when it already matches.
 
 Notes:
 - `setup` materializes Apple's complete equalized price matrix from the selected
@@ -205,12 +211,16 @@ Capture `.iapId` from the setup JSON, then create the version and metadata:
 ```bash
 asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc iap versions create --iap-id "IAP_ID" --output json
-# Capture .data.id as IAP_VERSION_ID.
+# Capture IAP_VERSION_ID from list .data[0].id or create .data.id.
+asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Pro Lifetime" --description "Unlock everything forever"
+asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Pro Lifetime" --description "Unlock everything forever"
 ```
 
 Reuse the single `PREPARE_FOR_SUBMISSION` version. Create only when the list is
 empty, and stop for an explicit version ID if multiple matches are returned.
+Create the localization only when `en-US` is absent, update its resolved ID only
+when values differ, and otherwise do nothing.
 
 Notes:
 - `setup` verifies the created IAP and price schedule by default; verify the

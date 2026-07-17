@@ -189,8 +189,11 @@ the existing submission:
 ```bash
 asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
-# Capture .data.id from the create response as SUBSCRIPTION_VERSION_ID.
+# Capture SUBSCRIPTION_VERSION_ID from list .data[0].id or create .data.id.
+asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium" --description "Premium access"
+asc subscriptions versions localizations update --id "SUBSCRIPTION_LOC_ID" --name "Premium" --description "Premium access"
+asc subscriptions versions images list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
 asc subscriptions versions images upload --version-id "SUBSCRIPTION_VERSION_ID" --file "./promotional.png"
 asc subscriptions versions view --id "SUBSCRIPTION_VERSION_ID" --output table
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
@@ -204,8 +207,10 @@ Subscription group versions follow the same existing-submission model:
 ```bash
 asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
-# Capture .data.id from the create response as GROUP_VERSION_ID.
+# Capture GROUP_VERSION_ID from list .data[0].id or create .data.id.
+asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
+asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --name "Premium"
 asc subscriptions groups versions view --version-id "GROUP_VERSION_ID" --output table
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupVersions --item-id "GROUP_VERSION_ID"
@@ -214,6 +219,12 @@ asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupV
 For each list above, reuse its single `PREPARE_FOR_SUBMISSION` result. Create
 only when the result is empty; if multiple matches are returned, stop and
 require an explicit version ID.
+
+The child writes are conditional too: create a missing locale, update its
+resolved ID only when values differ, and no-op when it already matches. Upload
+the subscription image only when the version has no intended image; replace an
+existing asset only as a separate, explicitly confirmed delete-and-upload
+operation.
 
 ### In-app purchases need review readiness or first-version inclusion
 
@@ -236,8 +247,11 @@ image, and review flow:
 ```bash
 asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc iap versions create --iap-id "IAP_ID" --output json
-# Capture .data.id from the create response as IAP_VERSION_ID.
+# Capture IAP_VERSION_ID from list .data[0].id or create .data.id.
+asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Premium" --description "Unlock premium features"
+asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Premium" --description "Unlock premium features"
+asc iap versions images list --version-id "IAP_VERSION_ID" --paginate --output json
 asc iap versions images create --version-id "IAP_VERSION_ID" --file "./review.png"
 asc iap versions view --version-id "IAP_VERSION_ID" --output table
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output table
@@ -248,6 +262,10 @@ asc iap versions submit --version-id "IAP_VERSION_ID" --submission "SUBMISSION_I
 
 Reuse the single `PREPARE_FOR_SUBMISSION` version. Create only when the list is
 empty, and stop for an explicit version ID if multiple matches are returned.
+Create the localization or image only when the corresponding list has no
+intended match; update a resolved localization only when values differ. Replace
+an existing image only through a separate, explicitly confirmed delete-and-
+create operation.
 
 For the first IAP on an app, or the first time adding a new IAP type, Apple may require selecting the IAP from the app version's "In-App Purchases and Subscriptions" section before submitting the app version. Prepare the IAP with localization, pricing, and review screenshot data first.
 
