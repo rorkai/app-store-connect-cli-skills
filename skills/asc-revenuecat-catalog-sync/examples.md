@@ -154,10 +154,18 @@ Goal: model recommended entitlement behavior by product type.
    it is missing or that complete set differs:
 
    ```bash
+   # CONDITIONAL PSEUDOCODE: do not run this block as a sequence.
+   # If the lifetime pricing summary returned the confirmed missing-schedule 404:
    asc iap pricing schedules create --iap-id "LIFETIME_IAP_ID" --base-territory "USA" --prices "LIFETIME_PRICE_POINT_ID" --output json
+   # If lifetime availability is missing or its complete territory set differs:
    asc iap pricing availability set --iap-id "LIFETIME_IAP_ID" --territories "USA" --output json
+   # Otherwise reuse the matching lifetime pricing and availability.
+
+   # If the coin pricing summary returned the confirmed missing-schedule 404:
    asc iap pricing schedules create --iap-id "COINS_IAP_ID" --base-territory "USA" --prices "COINS_PRICE_POINT_ID" --output json
+   # If coin availability is missing or its complete territory set differs:
    asc iap pricing availability set --iap-id "COINS_IAP_ID" --territories "USA" --output json
+   # Otherwise reuse the matching coin pricing and availability.
    ```
 
 4. Resolve zero/one/many mutable versions and finish each product's own
@@ -165,18 +173,27 @@ Goal: model recommended entitlement behavior by product type.
    conditional on the preceding fully paginated read returning zero matches:
 
    ```bash
+   # CONDITIONAL PSEUDOCODE: audit each list, then run only its matching branch.
    asc iap versions list --iap-id "LIFETIME_IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+   # If zero versions, create; if one, reuse; if more than one, stop:
    asc iap versions create --iap-id "LIFETIME_IAP_ID" --output json
    asc iap versions localizations list --version-id "LIFETIME_VERSION_ID" --paginate --output json
+   # If zero localizations, create; if one differs, update it by its resolved ID;
+   # if one matches, reuse; if more than one, stop:
    asc iap versions localizations create --version-id "LIFETIME_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock lifetime access." --output json
    asc iap versions images list --version-id "LIFETIME_VERSION_ID" --paginate --output json
+   # If zero images, upload; if one proven match, reuse; otherwise stop:
    asc iap versions images create --version-id "LIFETIME_VERSION_ID" --file "./lifetime-review.png" --output json
 
    asc iap versions list --iap-id "COINS_IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+   # If zero versions, create; if one, reuse; if more than one, stop:
    asc iap versions create --iap-id "COINS_IAP_ID" --output json
    asc iap versions localizations list --version-id "COINS_VERSION_ID" --paginate --output json
+   # If zero localizations, create; if one differs, update it by its resolved ID;
+   # if one matches, reuse; if more than one, stop:
    asc iap versions localizations create --version-id "COINS_VERSION_ID" --locale "en-US" --name "Coins 100" --description "Add 100 coins." --output json
    asc iap versions images list --version-id "COINS_VERSION_ID" --paginate --output json
+   # If zero images, upload; if one proven match, reuse; otherwise stop:
    asc iap versions images create --version-id "COINS_VERSION_ID" --file "./coins-100-review.png" --output json
    ```
 
@@ -225,8 +242,16 @@ Goal: make apply mode safe and repeatable in team workflows.
      `asc iap pricing availabilities available-territories --id "AVAILABILITY_ID" --paginate --output json`,
      and set availability only when it is missing or the complete approved and
      current territory-ID sets differ
-   - save and require a zero exit from `asc validate subscriptions --app "APP_ID" --strict --output json --pretty` and/or `asc validate iap --app "APP_ID" --strict --output json --pretty`
-   - RC app/product, but only for items whose applicable ASC gate passed
+   - when subscriptions exist in the plan, save and run
+     `asc validate subscriptions --app "APP_ID" --strict --output json --pretty`;
+     map no subscriptions unless this subscription-class gate exits zero
+   - when IAPs exist in the plan, save and run
+     `asc validate iap --app "APP_ID" --strict --output json --pretty`; map no
+     IAPs unless this IAP-class gate exits zero
+   - when both classes exist, run both validators; a failed class is skipped,
+     the other class may continue only if its own gate exits zero, and all gate
+     and per-item failures are aggregated
+   - RC app/product for items in each successfully gated class
    - RC entitlement + attachments
    - RC offering/package + attachments
 4. Continue after per-item failures, but never map an item whose ASC gate
