@@ -39,9 +39,9 @@ Goal: bootstrap both systems when store products are partially missing.
      means stop for an explicit ID. Follow [Step D](SKILL.md#step-d---ensure-missing-asc-items-if-requested)
      for every parent and mutable version; never create another resource to
      resolve ambiguity.
-3. For a missing subscription, use setup to reconcile its review screenshot,
-   complete price matrix, and requested sale availability before version
-   metadata. Repeat with the annual product ID and `ONE_YEAR`:
+3. For each missing subscription, use its own setup inputs to reconcile the
+   review screenshot, complete price matrix, and requested sale availability
+   before version metadata:
 
    ```bash
    asc subscriptions setup \
@@ -50,8 +50,21 @@ Goal: bootstrap both systems when store products are partially missing.
      --reference-name "Monthly" \
      --product-id "com.example.premium.monthly" \
      --subscription-period ONE_MONTH \
-     --review-screenshot "./review.png" \
+     --review-screenshot "./monthly-review.png" \
      --price "3.99" \
+     --price-territory "USA" \
+     --territories "USA" \
+     --no-verify \
+     --output json
+
+   asc subscriptions setup \
+     --app "APP_ID" \
+     --group-id "GROUP_ID" \
+     --reference-name "Annual" \
+     --product-id "com.example.premium.annual" \
+     --subscription-period ONE_YEAR \
+     --review-screenshot "./annual-review.png" \
+     --price "39.99" \
      --price-territory "USA" \
      --territories "USA" \
      --no-verify \
@@ -63,8 +76,10 @@ Goal: bootstrap both systems when store products are partially missing.
    a stale complete price matrix.
 4. Resolve zero/one/many `PREPARE_FOR_SUBMISSION` group and subscription
    versions, then create or update their version-scoped localizations as shown
-   in Step D. Read back the selected versions and gate all subscriptions before
-   any RevenueCat write:
+   in Step D. Use `Premium Monthly` with a monthly-specific description for the
+   monthly version and `Premium Annual` with an annual-specific description for
+   the annual version. Read back both selected versions and gate all
+   subscriptions before any RevenueCat write:
 
    ```bash
    mkdir -p "./audit"
@@ -94,8 +109,7 @@ Goal: model recommended entitlement behavior by product type.
 2. Resolve each IAP by exact `productId` with
    `asc iap list --app "APP_ID" --paginate --output json`. Zero exact matches
    means create, one means reuse its ID, and more than one means stop for an
-   explicit `IAP_ID`. For a missing IAP, create only the parent; repeat with
-   `CONSUMABLE` and the coin product ID:
+   explicit `IAP_ID`. For each missing IAP, create only its own parent:
 
    ```bash
    asc iap create \
@@ -104,26 +118,65 @@ Goal: model recommended entitlement behavior by product type.
      --ref-name "Lifetime" \
      --product-id "com.example.lifetime" \
      --output json
+
+   asc iap create \
+     --app "APP_ID" \
+     --type CONSUMABLE \
+     --ref-name "Coins 100" \
+     --product-id "com.example.coins.100" \
+     --output json
    ```
 
-3. For every resolved IAP, reconcile pricing and availability, then resolve
-   zero/one/many mutable versions and finish version-scoped localization and
-   review-image metadata. The create commands are conditional on a zero-match
-   read; update or do nothing for an existing match:
+3. Audit pricing and availability separately for each resolved IAP before
+   reconciling either one:
 
    ```bash
-   asc iap pricing summary --iap-id "IAP_ID" --output json
-   asc iap pricing schedules create --iap-id "IAP_ID" --base-territory "USA" --prices "PRICE_POINT_ID" --output json
-   asc iap pricing availability set --iap-id "IAP_ID" --territories "USA" --output json
-   asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
-   asc iap versions create --iap-id "IAP_ID" --output json
-   asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
-   asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock lifetime access." --output json
-   asc iap versions images list --version-id "IAP_VERSION_ID" --paginate --output json
-   asc iap versions images create --version-id "IAP_VERSION_ID" --file "./review.png" --output json
+   asc iap pricing summary --iap-id "LIFETIME_IAP_ID" --output json
+   asc iap pricing availability view --iap-id "LIFETIME_IAP_ID" --output json
+   asc iap pricing summary --iap-id "COINS_IAP_ID" --output json
+   asc iap pricing availability view --iap-id "COINS_IAP_ID" --output json
    ```
 
-4. Gate all resolved IAPs before any RevenueCat creation or attachment:
+   Only an App Store Connect `404` from the pricing summary proves that a price
+   schedule is absent. Stop and report authentication, transport, decoding, and
+   every other summary error. After confirmation, create a missing schedule or
+   set availability only when the corresponding successful read proves the
+   desired per-product value differs:
+
+   ```bash
+   asc iap pricing schedules create --iap-id "LIFETIME_IAP_ID" --base-territory "USA" --prices "LIFETIME_PRICE_POINT_ID" --output json
+   asc iap pricing availability set --iap-id "LIFETIME_IAP_ID" --territories "USA" --output json
+   asc iap pricing schedules create --iap-id "COINS_IAP_ID" --base-territory "USA" --prices "COINS_PRICE_POINT_ID" --output json
+   asc iap pricing availability set --iap-id "COINS_IAP_ID" --territories "USA" --output json
+   ```
+
+4. Resolve zero/one/many mutable versions and finish each product's own
+   version-scoped localization and review image. Every create below is
+   conditional on the preceding fully paginated read returning zero matches:
+
+   ```bash
+   asc iap versions list --iap-id "LIFETIME_IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+   asc iap versions create --iap-id "LIFETIME_IAP_ID" --output json
+   asc iap versions localizations list --version-id "LIFETIME_VERSION_ID" --paginate --output json
+   asc iap versions localizations create --version-id "LIFETIME_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock lifetime access." --output json
+   asc iap versions images list --version-id "LIFETIME_VERSION_ID" --paginate --output json
+   asc iap versions images create --version-id "LIFETIME_VERSION_ID" --file "./lifetime-review.png" --output json
+
+   asc iap versions list --iap-id "COINS_IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+   asc iap versions create --iap-id "COINS_IAP_ID" --output json
+   asc iap versions localizations list --version-id "COINS_VERSION_ID" --paginate --output json
+   asc iap versions localizations create --version-id "COINS_VERSION_ID" --locale "en-US" --name "Coins 100" --description "Add 100 coins." --output json
+   asc iap versions images list --version-id "COINS_VERSION_ID" --paginate --output json
+   asc iap versions images create --version-id "COINS_VERSION_ID" --file "./coins-100-review.png" --output json
+   ```
+
+   Update an existing localization only when its resolved values differ. For an
+   image, zero matches means upload and one proven matching image means reuse.
+   More than one match, a differing image, or an image that cannot be proven to
+   match must stop and be reported: `images update` changes upload state only,
+   it cannot replace the file, and this workflow never deletes resources.
+
+5. Gate all resolved IAPs before any RevenueCat creation or attachment:
 
    ```bash
    mkdir -p "./audit"
@@ -131,11 +184,11 @@ Goal: model recommended entitlement behavior by product type.
      > "./audit/iap-validation.json"
    ```
 
-5. Only after the validator exits zero, apply the confirmed RevenueCat plan:
+6. Only after the validator exits zero, apply the confirmed RevenueCat plan:
    - create both products
    - attach **non-consumable** product to an entitlement (for example `lifetime_access`)
    - skip entitlement attachment for consumable by default (unless user explicitly asks)
-6. Re-read both catalogs and return created/skipped/failed counts.
+7. Re-read both catalogs and return created/skipped/failed counts.
 
 ## Example 4: Controlled apply in CI-style automation
 
@@ -150,8 +203,14 @@ Goal: make apply mode safe and repeatable in team workflows.
 3. Apply each approved item in deterministic order:
    - resolve ASC parents and mutable versions with the zero/one/many rules in
      Step D
-   - reconcile version-scoped metadata, review screenshots/images, pricing,
-     and availability
+   - preserve each product's own identifiers, names, periods, prices, locales,
+     and image paths; never reuse one product's template values for another
+   - reconcile version-scoped metadata and review screenshots/images; upload a
+     missing image, reuse a proven match, and stop on a differing or ambiguous
+     image because this no-delete workflow cannot replace it
+   - read IAP pricing summary and availability separately; only a summary `404`
+     means no schedule, every other error stops that item, and availability is
+     set only when a successful read proves the approved territory set differs
    - save and require a zero exit from `asc validate subscriptions --app "APP_ID" --strict --output json --pretty` and/or `asc validate iap --app "APP_ID" --strict --output json --pretty`
    - RC app/product, but only for items whose applicable ASC gate passed
    - RC entitlement + attachments
