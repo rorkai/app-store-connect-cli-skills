@@ -129,7 +129,9 @@ For `.pkg` uploads, `--version` and `--build-number` are required because they a
 
 ## Raw xcodebuild fallback
 
-Use raw `xcodebuild` only when `asc xcode archive/export --help` does not cover a project-specific option. Prefer passing extra arguments through `--xcodebuild-flag` first.
+Use raw `xcodebuild` only when neither `asc xcode archive --help` nor
+`asc xcode export --help` covers a project-specific option. Prefer passing
+extra arguments through `--xcodebuild-flag` first.
 
 ```bash
 xcodebuild -showBuildSettings -scheme "App"
