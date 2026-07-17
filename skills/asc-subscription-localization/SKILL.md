@@ -35,11 +35,16 @@ asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_S
 asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output table
 ```
 
-Create a version only when the requested review lifecycle needs a new one:
+Branch independently on each list result: zero matches means create, one means
+reuse that version ID, and more than one means stop and require an explicit
+version ID. Run each command below only for its zero-match branch:
 
 ```bash
+# If and only if the IAP version list returned zero matches:
 asc iap versions create --iap-id "IAP_ID" --output json
+# If and only if the subscription version list returned zero matches:
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
+# If and only if the group version list returned zero matches:
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 ```
 
