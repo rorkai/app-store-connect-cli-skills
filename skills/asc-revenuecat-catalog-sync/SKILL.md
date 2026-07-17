@@ -100,13 +100,16 @@ only when the fully paginated read proves it is missing. A RevenueCat product
 mapping is not proof that the corresponding ASC subscription is review-ready.
 
 ```bash
-# Resolve GROUP_ID by exact referenceName. Create only if absent.
+# Resolve GROUP_ID by exact referenceName.
 asc subscriptions groups list --app "APP_ID" --paginate --output json
+# If and only if the fully paginated list has zero exact matches:
 asc subscriptions groups create --app "APP_ID" --reference-name "Premium" --output json
+# For one match, reuse its ID. For more than one, stop and require an explicit GROUP_ID.
 
 # Resolve SUB_ID by exact productId within GROUP_ID. Run setup only for a missing
 # parent or an explicitly approved reconciliation of that same product ID.
 asc subscriptions list --group-id "GROUP_ID" --paginate --output json
+# If and only if the fully paginated list has zero exact matches, run setup:
 asc subscriptions setup \
   --app "APP_ID" \
   --group-id "GROUP_ID" \
@@ -119,10 +122,14 @@ asc subscriptions setup \
   --territories "USA" \
   --no-verify \
   --output json
+# For one match, reuse its ID. For more than one, stop and require an explicit SUB_ID.
+# Re-run setup for an existing SUB_ID only for an explicitly approved reconciliation.
 
 # Resolve the unique mutable group version for this review lifecycle.
 asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+# If and only if the list has zero matches:
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
+# For one match, reuse .data[0].id. For more than one, stop and require an explicit GROUP_VERSION_ID.
 
 # Resolve the en-US localization on GROUP_VERSION_ID. Create it only when
 # missing; update the resolved localization ID when its values differ.
@@ -132,7 +139,9 @@ asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --nam
 
 # Resolve the unique mutable subscription version for this review lifecycle.
 asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+# If and only if the list has zero matches:
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
+# For one match, reuse .data[0].id. For more than one, stop and require an explicit SUBSCRIPTION_VERSION_ID.
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium Monthly" --description "Unlock all premium features." --output json
 asc subscriptions versions localizations update --id "SUBSCRIPTION_LOC_ID" --name "Premium Monthly" --description "Unlock all premium features."
@@ -142,18 +151,22 @@ asc subscriptions groups versions localizations list --version-id "GROUP_VERSION
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc validate subscriptions --app "APP_ID" --output table
 
-# Resolve IAP_ID by exact productId. Create only if absent.
+# Resolve IAP_ID by exact productId.
 asc iap list --app "APP_ID" --paginate --output json
+# If and only if the fully paginated list has zero exact matches:
 asc iap create \
   --app "APP_ID" \
   --type NON_CONSUMABLE \
   --ref-name "Lifetime" \
   --product-id "com.example.lifetime" \
   --output json
+# For one match, reuse its ID. For more than one, stop and require an explicit IAP_ID.
 
 # Resolve the unique mutable IAP version for this review lifecycle.
 asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+# If and only if the list has zero matches:
 asc iap versions create --iap-id "IAP_ID" --output json
+# For one match, reuse .data[0].id. For more than one, stop and require an explicit IAP_VERSION_ID.
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Lifetime" --description "Unlock all premium features." --output json
 asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Lifetime" --description "Unlock all premium features."

@@ -5,7 +5,11 @@ description: Bulk-localize subscription, subscription-group, and in-app purchase
 
 # asc subscription localization
 
-Use this skill to bulk-create or bulk-update display names (and descriptions) for subscriptions, subscription groups, and in-app purchases across all App Store Connect locales. This eliminates the tedious manual process of clicking through each language in App Store Connect to set the same display name.
+Use this skill to bulk-create or bulk-update display names and, where supported,
+descriptions for subscriptions, subscription groups, and in-app purchases across
+all App Store Connect locales. This eliminates the tedious manual process of
+clicking through each language in App Store Connect to set the same display
+name.
 
 ## Preconditions
 - Auth configured (`asc auth login` or `ASC_*` env vars).
@@ -78,6 +82,11 @@ live service currently rejects both an empty `--description` and
 `--clear-description` for subscription-version localizations because the
 description must contain at least one character.
 
+Creating a missing subscription-version localization therefore requires a
+non-empty description. A display-name-only run may update the name of an
+existing localization, but must not create a missing locale until the user
+provides a non-empty locale-specific or shared fallback description.
+
 ## Workflow: Bulk-localize a subscription group version (v2)
 
 ```bash
@@ -109,7 +118,9 @@ asc iap versions localizations list --version-id "VERSION_ID" --paginate --outpu
 
 Apple's live service also rejects empty descriptions and
 `--clear-description` for IAP-version localizations even though the 4.4.1
-schema permits JSON `null`.
+schema permits JSON `null`. As with subscriptions, a display-name-only run may
+update existing IAP localizations but must not create missing locales until a
+non-empty description is available.
 
 ## Bulk-localize all subscription versions in an app
 
@@ -146,7 +157,17 @@ matches are returned.
   values differ, and do nothing when the existing values already match.
 - When the user provides a single display name, use it for all locales (same name everywhere).
 - When the user provides translated names per locale, use the locale-specific name for each.
-- If a description is provided, pass `--description` on create. Otherwise omit it.
+- For subscription- and IAP-version localizations, require a non-empty
+  `--description` on every create. If the user supplies only display names,
+  update existing localizations by resolved ID, skip creates for missing
+  locales, and ask for locale-specific descriptions or one non-empty fallback
+  description before creating them.
+- On updates to existing subscription- or IAP-version localizations, omit
+  `--description` unless the user supplied a new non-empty value; never infer an
+  empty value or clear it.
+- Subscription-group-version localizations do not have a description field.
+  Create or update their names normally, with `--custom-app-name` only when the
+  user supplied that value.
 - Use `--output table` for verification steps so the user can visually confirm.
 - Use explicit `--output json` for intermediate automation steps; output
   defaults are TTY-aware.
