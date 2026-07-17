@@ -188,13 +188,66 @@ the existing submission:
 
 ```bash
 asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+```
+
+Branch on the number of returned versions before any write:
+
+- Zero: create one version and capture `.data.id` as
+  `SUBSCRIPTION_VERSION_ID`.
+- One: reuse `.data[0].id` as `SUBSCRIPTION_VERSION_ID`; do not create.
+- More than one: stop and require the user to choose an explicit version ID.
+
+Run this only in the zero-result branch:
+
+```bash
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
-# Capture SUBSCRIPTION_VERSION_ID from list .data[0].id or create .data.id.
+```
+
+Resolve the intended locale before writing:
+
+```bash
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
+```
+
+If `en-US` is absent, create it:
+
+```bash
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Premium" --description "Premium access"
+```
+
+If the single resolved `en-US` localization exists but differs, update that
+resolved ID. If it already matches, reuse it and do nothing. Stop if locale
+resolution is ambiguous.
+
+```bash
 asc subscriptions versions localizations update --id "SUBSCRIPTION_LOC_ID" --name "Premium" --description "Premium access"
+```
+
+Resolve images before writing:
+
+```bash
 asc subscriptions versions images list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output json
+```
+
+If the intended image is already present, reuse it and do nothing. If no image
+is present, upload it:
+
+```bash
 asc subscriptions versions images upload --version-id "SUBSCRIPTION_VERSION_ID" --file "./promotional.png"
+```
+
+If a different image must be replaced, make that a separate, explicitly
+confirmed branch using its resolved ID, then upload the replacement:
+
+```bash
+asc subscriptions versions images delete --id "SUBSCRIPTION_IMAGE_ID" --confirm
+asc subscriptions versions images upload --version-id "SUBSCRIPTION_VERSION_ID" --file "./promotional.png"
+```
+
+Inspect the resolved version and children before adding the version to the
+existing review submission:
+
+```bash
 asc subscriptions versions view --id "SUBSCRIPTION_VERSION_ID" --output table
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc subscriptions versions images primary --version-id "SUBSCRIPTION_VERSION_ID" --output table
@@ -206,25 +259,48 @@ Subscription group versions follow the same existing-submission model:
 
 ```bash
 asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+```
+
+Branch on the number of returned group versions before any write:
+
+- Zero: create one version and capture `.data.id` as `GROUP_VERSION_ID`.
+- One: reuse `.data[0].id` as `GROUP_VERSION_ID`; do not create.
+- More than one: stop and require the user to choose an explicit version ID.
+
+Run this only in the zero-result branch:
+
+```bash
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
-# Capture GROUP_VERSION_ID from list .data[0].id or create .data.id.
+```
+
+Resolve the intended locale before writing:
+
+```bash
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output json
+```
+
+If `en-US` is absent, create it:
+
+```bash
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Premium"
+```
+
+If the single resolved `en-US` localization exists but differs, update that
+resolved ID. If it already matches, reuse it and do nothing. Stop if locale
+resolution is ambiguous.
+
+```bash
 asc subscriptions groups versions localizations update --id "GROUP_LOC_ID" --name "Premium"
+```
+
+Inspect the resolved group version and localizations before adding it to the
+existing review submission:
+
+```bash
 asc subscriptions groups versions view --version-id "GROUP_VERSION_ID" --output table
 asc subscriptions groups versions localizations list --version-id "GROUP_VERSION_ID" --paginate --output table
 asc review items add --submission "SUBMISSION_ID" --item-type subscriptionGroupVersions --item-id "GROUP_VERSION_ID"
 ```
-
-For each list above, reuse its single `PREPARE_FOR_SUBMISSION` result. Create
-only when the result is empty; if multiple matches are returned, stop and
-require an explicit version ID.
-
-The child writes are conditional too: create a missing locale, update its
-resolved ID only when values differ, and no-op when it already matches. Upload
-the subscription image only when the version has no intended image; replace an
-existing asset only as a separate, explicitly confirmed delete-and-upload
-operation.
 
 ### In-app purchases need review readiness or first-version inclusion
 
@@ -246,26 +322,71 @@ image, and review flow:
 
 ```bash
 asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
+```
+
+Branch on the number of returned IAP versions before any write:
+
+- Zero: create one version and capture `.data.id` as `IAP_VERSION_ID`.
+- One: reuse `.data[0].id` as `IAP_VERSION_ID`; do not create.
+- More than one: stop and require the user to choose an explicit version ID.
+
+Run this only in the zero-result branch:
+
+```bash
 asc iap versions create --iap-id "IAP_ID" --output json
-# Capture IAP_VERSION_ID from list .data[0].id or create .data.id.
+```
+
+Resolve the intended locale before writing:
+
+```bash
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output json
+```
+
+If `en-US` is absent, create it:
+
+```bash
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Premium" --description "Unlock premium features"
+```
+
+If the single resolved `en-US` localization exists but differs, update that
+resolved ID. If it already matches, reuse it and do nothing. Stop if locale
+resolution is ambiguous.
+
+```bash
 asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Premium" --description "Unlock premium features"
+```
+
+Resolve images before writing:
+
+```bash
 asc iap versions images list --version-id "IAP_VERSION_ID" --paginate --output json
+```
+
+If the intended image is already present, reuse it and do nothing. If no image
+is present, create it:
+
+```bash
 asc iap versions images create --version-id "IAP_VERSION_ID" --file "./review.png"
+```
+
+If a different image must be replaced, make that a separate, explicitly
+confirmed branch using its resolved ID, then create the replacement:
+
+```bash
+asc iap versions images delete --image-id "IAP_IMAGE_ID" --confirm
+asc iap versions images create --version-id "IAP_VERSION_ID" --file "./review.png"
+```
+
+Inspect the resolved version and children before adding it to the existing
+review submission:
+
+```bash
 asc iap versions view --version-id "IAP_VERSION_ID" --output table
 asc iap versions localizations list --version-id "IAP_VERSION_ID" --paginate --output table
 asc iap versions image --version-id "IAP_VERSION_ID" --output table
 asc iap versions images list --version-id "IAP_VERSION_ID" --paginate --output table
 asc iap versions submit --version-id "IAP_VERSION_ID" --submission "SUBMISSION_ID" --confirm
 ```
-
-Reuse the single `PREPARE_FOR_SUBMISSION` version. Create only when the list is
-empty, and stop for an explicit version ID if multiple matches are returned.
-Create the localization or image only when the corresponding list has no
-intended match; update a resolved localization only when values differ. Replace
-an existing image only through a separate, explicitly confirmed delete-and-
-create operation.
 
 For the first IAP on an app, or the first time adding a new IAP type, Apple may require selecting the IAP from the app version's "In-App Purchases and Subscriptions" section before submitting the app version. Prepare the IAP with localization, pricing, and review screenshot data first.
 
