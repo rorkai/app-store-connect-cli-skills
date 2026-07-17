@@ -83,12 +83,20 @@ description must contain at least one character.
 ```bash
 asc subscriptions groups versions localizations list --version-id "VERSION_ID" --paginate --output table
 asc subscriptions groups versions localizations create --version-id "VERSION_ID" --locale "LOCALE" --name "Group Display Name" --custom-app-name "My App"
-asc subscriptions groups versions localizations update --id "LOC_ID" --clear-custom-app-name
+asc subscriptions groups versions localizations update --id "LOC_ID" --name "Updated Group Display Name" --custom-app-name "My App"
 asc subscriptions groups versions localizations list --version-id "VERSION_ID" --paginate --output table
 ```
 
-Use `--clear-name` or `--clear-custom-app-name` only when JSON `null` is
-intended; omission leaves the attribute unchanged.
+Clearing metadata is a separate, explicit opt-in operation. After confirming
+that the user wants to remove an existing custom app name, run:
+
+```bash
+asc subscriptions groups versions localizations update --id "LOC_ID" --clear-custom-app-name
+```
+
+Do not include `--clear-name` or `--clear-custom-app-name` in the standard bulk
+localization workflow. Use either flag only when JSON `null` is deliberately
+intended; omitting the flag leaves that attribute unchanged.
 
 ## Workflow: Bulk-localize an IAP version (v2)
 
