@@ -84,12 +84,12 @@ Create a new App Store Connect app for com.example.myapp with SKU MYAPP123 and p
 
 ### asc-xcode-build
 
-Build, archive, export, and manage Xcode version/build numbers before uploading.
+Build, archive, generate export options, export, and manage Xcode version/build numbers before uploading.
 
 **Use when:**
 - You need to create an IPA or PKG for upload
 - You're setting up CI/CD build pipelines
-- You need to configure ExportOptions.plist
+- You need to generate or customize ExportOptions.plist
 - You're troubleshooting encryption compliance issues
 
 **Example:**
