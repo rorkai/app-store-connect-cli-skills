@@ -30,13 +30,28 @@ Use this skill to map names to IDs needed by other commands.
 API 4.4.1 version IDs are distinct from IAP product, subscription, and
 subscription-group IDs:
 
-- IAP versions: `asc iap versions list --iap-id "IAP_ID" --paginate`
-- Subscription versions: `asc subscriptions versions list --subscription-id "SUB_ID" --paginate`
-- Subscription group versions: `asc subscriptions groups versions list --group-id "GROUP_ID" --paginate`
+Resolve the owning resources first:
+
+- IAPs: `asc iap list --app "APP_ID" --paginate --output json`
+- Subscription groups: `asc subscriptions groups list --app "APP_ID" --paginate --output json`
+- Subscriptions: `asc subscriptions list --app "APP_ID" --paginate --output json`
+  or `asc subscriptions list --group-id "GROUP_ID" --paginate --output json`
+
+Then resolve their version IDs:
+
+- IAP versions: `asc iap versions list --iap-id "IAP_ID" --paginate --output json`
+- Subscription versions: `asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output json`
+- Subscription group versions: `asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output json`
 
 Resolve child localization or image IDs from the corresponding version subtree:
 
-- `asc subscriptions versions localizations list --version-id "VERSION_ID" --paginate`
+- IAP localizations: `asc iap versions localizations list --version-id "VERSION_ID" --paginate --output json`
+- IAP primary image: `asc iap versions image --version-id "VERSION_ID" --output json`
+- IAP image collection: `asc iap versions images list --version-id "VERSION_ID" --paginate --output json`
+- Subscription localizations: `asc subscriptions versions localizations list --version-id "VERSION_ID" --paginate --output json`
+- Subscription primary image: `asc subscriptions versions images primary --version-id "VERSION_ID" --output json`
+- Subscription image collection: `asc subscriptions versions images list --version-id "VERSION_ID" --paginate --output json`
+- Subscription-group localizations: `asc subscriptions groups versions localizations list --version-id "VERSION_ID" --paginate --output json`
 
 ## TestFlight IDs
 - Groups:
@@ -51,7 +66,10 @@ Resolve child localization or image IDs from the corresponding version subtree:
 - `asc review submissions-list --app "APP_ID" --paginate`
 
 ## Output tips
-- JSON is default; use `--pretty` for debug.
+- Output defaults are TTY-aware: table in a terminal and minified JSON in pipes
+  or CI. An explicit `--output` wins.
+- Use explicit `--output json` for automation and add `--pretty` only for
+  human-readable JSON.
 - For human viewing, use `--output table` or `--output markdown`.
 
 ## Guardrails

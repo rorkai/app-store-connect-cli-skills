@@ -123,8 +123,10 @@ Use `equalizations` for Apple's standard localized ladder. Use
 `adjusted-equalizations` when you need the API 4.4.1 subscription-specific
 adjustments, optionally filtered by `--subscription-id`, `--territory`,
 `--plan-type MONTHLY`, or `--upfront-price-point-id`. Treat `--next` as an
-opaque continuation URL: do not combine it with filters, sparse fields,
-includes, or limits.
+opaque continuation URL. On a resumed equalizations request, pass `--next`
+without the original owner `--price-point-id`, filters, sparse fields, includes,
+or limit; the continuation URL already carries that query state. `--paginate`
+and explicit output flags may still be used.
 
 ### Verify after apply
 Re-run the summary and raw list views after changes.
