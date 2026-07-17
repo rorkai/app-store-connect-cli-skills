@@ -49,10 +49,12 @@ v1 localizations, the parent can remain `MISSING_METADATA` until the v2 steps
 finish.
 
 ```bash
+asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 # Capture .data.id as GROUP_VERSION_ID.
 asc subscriptions groups versions localizations create --version-id "GROUP_VERSION_ID" --locale "en-US" --name "Pro"
 
+asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc subscriptions versions create --subscription-id "SUB_ID" --output json
 # Capture .data.id as SUBSCRIPTION_VERSION_ID.
 asc subscriptions versions localizations create --version-id "SUBSCRIPTION_VERSION_ID" --locale "en-US" --name "Pro Monthly" --description "Unlock everything"
@@ -60,6 +62,11 @@ asc subscriptions groups versions localizations list --version-id "GROUP_VERSION
 asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION_ID" --paginate --output table
 asc validate subscriptions --app "APP_ID" --output table
 ```
+
+For each version list, reuse its single `PREPARE_FOR_SUBMISSION` result. Create
+only when the result is empty; if more than one result is returned, stop and
+require an explicit version ID instead of creating another non-deletable
+version.
 
 Notes:
 - `setup` materializes Apple's complete equalized price matrix from the selected
@@ -196,10 +203,14 @@ asc iap setup \
 Capture `.iapId` from the setup JSON, then create the version and metadata:
 
 ```bash
+asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output json
 asc iap versions create --iap-id "IAP_ID" --output json
 # Capture .data.id as IAP_VERSION_ID.
 asc iap versions localizations create --version-id "IAP_VERSION_ID" --locale "en-US" --name "Pro Lifetime" --description "Unlock everything forever"
 ```
+
+Reuse the single `PREPARE_FOR_SUBMISSION` version. Create only when the list is
+empty, and stop for an explicit version ID if multiple matches are returned.
 
 Notes:
 - `setup` verifies the created IAP and price schedule by default; verify the

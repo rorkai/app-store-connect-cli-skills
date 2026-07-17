@@ -26,9 +26,9 @@ groups. A version ID is different from its product, subscription, or group ID.
 Resolve or create versions before localizing them:
 
 ```bash
-asc iap versions list --iap-id "IAP_ID" --paginate --output table
-asc subscriptions versions list --subscription-id "SUB_ID" --paginate --output table
-asc subscriptions groups versions list --group-id "GROUP_ID" --paginate --output table
+asc iap versions list --iap-id "IAP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output table
+asc subscriptions versions list --subscription-id "SUB_ID" --state PREPARE_FOR_SUBMISSION --paginate --output table
+asc subscriptions groups versions list --group-id "GROUP_ID" --state PREPARE_FOR_SUBMISSION --paginate --output table
 ```
 
 Create a version only when the requested review lifecycle needs a new one:
@@ -40,9 +40,10 @@ asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 ```
 
 None of the three version families has a version delete command. List and
-reuse an existing version when it matches the intended review lifecycle. Live
-parent deletion did not cascade IAP or subscription versions, so do not assume
-parent deletion cleans up versions created for testing.
+reuse the single `PREPARE_FOR_SUBMISSION` version; create only for zero matches,
+and stop for an explicit ID when multiple matches exist. Live parent deletion
+did not cascade IAP or subscription versions, so do not assume parent deletion
+cleans up versions created for testing.
 
 ## Supported App Store Locales
 
