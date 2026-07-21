@@ -150,7 +150,7 @@ There is no dedicated retry command. Use this sequence:
 2. Repair the proven blockers.
 3. Re-run `asc validate` and the relevant product validators.
 4. Confirm no active submission already owns the version or review items.
-5. Hand the healthy version to `asc-release-flow` for the new submission.
+5. Hand the healthy version and any preserved `SUBMISSION_ID` to `asc-release-flow` for submission execution. Reuse an inspected `READY_FOR_REVIEW` draft; create a submission only when no matching draft or active submission exists.
 
 ## Common failure routing
 

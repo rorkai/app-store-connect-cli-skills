@@ -39,6 +39,8 @@ Do not mix lanes after one has already created a review submission. Inspect the 
 
 ## Run the readiness gate
 
+Apply this gate to a version that already has the intended build attached. For the staging lane, first complete [Stage an existing build](#stage-an-existing-build); `asc release stage` attaches the build and runs validation, after which this gate can be evaluated. Do not route an expected pre-staging "build not attached" result to `asc-submission-health`.
+
 Validate before any submission:
 
 ```bash
@@ -55,7 +57,7 @@ Digital goods are a hard gate. If the release includes IAPs or subscriptions, st
 
 For Game Center items, complete only [Prepare every item](references/multi-item-submissions.md#prepare-every-item), then return to this flow. Do not assemble or submit the multi-item review submission during readiness.
 
-If app validation reports a Game Center item blocker, stop and use that preparation section. For every other blocker, stop the release flow and use `asc-submission-health`. Do not bury unrelated remediation inside the release run.
+If app validation reports a Game Center item blocker, stop and use that preparation section. If the only blocker is an unattached build in the staging lane, continue to the staging section. For every other blocker, stop the release flow and use `asc-submission-health`. Do not bury unrelated remediation inside the release run.
 
 ## Stage an existing build
 
