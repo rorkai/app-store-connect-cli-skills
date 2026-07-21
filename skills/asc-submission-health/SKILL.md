@@ -74,6 +74,8 @@ Read [references/digital-goods.md](references/digital-goods.md) only when IAP or
 
 Read [references/app-privacy.md](references/app-privacy.md) only when validation reports an App Privacy advisory or the publish state cannot be confirmed through the public API.
 
+When validation reports a Game Center component or version blocker, hand it to `asc-release-flow` and request the multi-item reference's **Prepare every item** section. Do not route Game Center through general readiness or digital-goods repairs.
+
 Use the web-session commands only for a gap the public API cannot cover, and say that an authenticated Apple web session is required. Keep a manual App Store Connect fallback when the user declines web-session automation.
 
 ## Decide whether the version is healthy
@@ -156,6 +158,7 @@ There is no dedicated retry command. Use this sequence:
 | Export compliance must be approved | build info and encryption declaration | readiness repairs |
 | Multiple app infos found | `asc apps info list --app "APP_ID"` | resolve exact app-info ID |
 | IAP or subscription is not ready | product validator | digital-goods reference |
+| Game Center component or version is not ready | `asc validate` diagnostic | `asc-release-flow` multi-item preparation section |
 | App Privacy publish state is unclear | validation advisory | App Privacy reference |
 | Review appears stuck | review status plus history | monitor; cancel only with evidence and approval |
 
