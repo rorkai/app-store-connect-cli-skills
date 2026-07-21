@@ -128,9 +128,7 @@ For readiness failures, blocker diagnosis, monitoring, cancellation, or retry de
 
 **Example:**
 
-```bash
-Stage version 2.4.0 with the selected build, show the dry-run plan, and submit it after confirmation.
-```
+> Stage version 2.4.0 with the selected build, show the dry-run plan, and submit it after confirmation.
 
 ### asc-signing-setup
 

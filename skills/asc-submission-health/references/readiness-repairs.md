@@ -106,7 +106,7 @@ asc apps info list --app "APP_ID" --output table
 asc localizations list --app "APP_ID" --type app-info --app-info "APP_INFO_ID" --output table
 ```
 
-For apps with subscriptions or IAPs, populate the privacy policy URL when missing:
+For every iOS or macOS app, populate the privacy policy URL when missing:
 
 ```bash
 asc app-setup info set \

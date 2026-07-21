@@ -38,17 +38,17 @@ asc review submissions-list \
 
 Branch before writing:
 
-- If `asc-submission-health` or the caller handed off a `SUBMISSION_ID`, inspect it with `asc review submissions-get --id "SUBMISSION_ID" --include "items,appStoreVersionForReview" --output json`. Reuse it only when it is the intended `READY_FOR_REVIEW` draft.
-- If exactly one `READY_FOR_REVIEW` draft matches the intended release, capture and reuse its ID.
-- If no matching draft or active submission exists, create one and capture its ID:
+- If `asc-submission-health` or the caller handed off a `SUBMISSION_ID`, inspect it with `asc review submissions-get --id "SUBMISSION_ID" --include "items,appStoreVersionForReview" --output json`. Reuse it only when it is the intended `READY_FOR_REVIEW` draft. If it fails that check, stop; do not create another submission or add items.
+- With no handed-off ID, if exactly one `READY_FOR_REVIEW` draft matches the intended release, capture and reuse its ID.
+- With no handed-off ID, if no matching draft or active submission exists for the intended version or review items, create one and capture its ID:
 
 ```bash
 asc review submissions-create --app "APP_ID" --platform IOS --output json
 ```
 
-- If more than one draft could match, or the intended version already has a submission in another active state, stop and diagnose through `asc-submission-health`. Do not create a second submission.
+- Otherwise—when drafts are ambiguous or the intended version or review items belong to another active submission—stop and diagnose through `asc-submission-health`. Do not create a second submission.
 
-Use the reused or newly created ID as `SUBMISSION_ID` below.
+Use the reused or newly created ID as `SUBMISSION_ID` below. If neither branch assigned one, do not continue.
 
 Add the app version first, followed by the resolved product and Game Center version items:
 

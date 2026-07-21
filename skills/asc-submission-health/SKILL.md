@@ -123,12 +123,14 @@ asc review history --app "APP_ID" --version "1.2.3" --paginate --output table
 Resolve the exact active submission before cancelling. Preview status first, then require confirmation:
 
 ```bash
+asc submit status --id "SUBMISSION_ID" --output table
 asc submit cancel --id "SUBMISSION_ID" --confirm
 ```
 
 When resolving by version, include the app for the modern review-submission lookup:
 
 ```bash
+asc submit status --version-id "VERSION_ID" --output table
 asc submit cancel --version-id "VERSION_ID" --app "APP_ID" --confirm
 ```
 
