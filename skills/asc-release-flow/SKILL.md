@@ -1,11 +1,11 @@
 ---
 name: asc-release-flow
-description: Orchestrate App Store releases with asc, including staging a version, uploading or building an artifact, publishing, and submitting for review. Use when the user wants to prepare or execute a release; route readiness failures, stuck submissions, cancellation, and retry decisions to asc-submission-health.
+description: Orchestrate App Store releases with asc, including staging a version, uploading or building an artifact, publishing, and submitting for review. Use when the user wants to prepare or execute a release. Keep Game Center item preparation in this skill; route other readiness failures, stuck submissions, cancellation, and retry decisions to asc-submission-health.
 ---
 
 # App Store release orchestration
 
-Use this skill to carry a release from an approved plan to App Store review. Keep blocker diagnosis and review recovery in `asc-submission-health`.
+Use this skill to carry a release from an approved plan to App Store review. Keep Game Center item preparation here; keep other blocker diagnosis and review recovery in `asc-submission-health`.
 
 ## Ownership boundary
 
@@ -16,7 +16,7 @@ This skill owns:
 - submitting a prepared version;
 - assembling a multi-item review submission.
 
-Stop and use `asc-submission-health` when validation reports blockers, a submission is stuck, or the user wants to cancel or retry review.
+Use [references/multi-item-submissions.md](references/multi-item-submissions.md) for Game Center item preparation or attachment blockers. Stop and use `asc-submission-health` for other validation blockers, a stuck submission, cancellation, or retry decisions.
 
 ## Preconditions
 
@@ -53,7 +53,7 @@ asc validate --app "APP_ID" --version "1.2.3" --platform IOS --strict --output t
 
 If the app includes digital goods, use `asc-submission-health` to verify those resources before returning to this flow. If it includes Game Center items, continue with [references/multi-item-submissions.md](references/multi-item-submissions.md), which owns their preparation and attachment.
 
-If validation reports a blocker, stop the release flow and use `asc-submission-health`. Do not bury remediation inside the release run.
+If validation reports a Game Center item blocker, stop and use [references/multi-item-submissions.md](references/multi-item-submissions.md). For every other blocker, stop the release flow and use `asc-submission-health`. Do not bury unrelated remediation inside the release run.
 
 ## Stage an existing build
 
