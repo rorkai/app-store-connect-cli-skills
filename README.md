@@ -117,17 +117,19 @@ Build my iOS app, capture the home and settings screens in the simulator, frame 
 
 ### asc-release-flow
 
-Readiness-first App Store submission guidance, including `asc validate`, `asc release stage`, `asc review submit`, and first-time release blockers.
+Stage, upload, publish, and submit App Store releases through dry-run and confirmation-oriented orchestration.
 
 **Use when:**
-- You want the quickest answer to "can I submit this app now?"
-- You need to separate API-fixable, web-session-fixable, and manual blockers
-- You're handling first-time submission issues around availability, IAPs, subscriptions, Game Center, or App Privacy
+- A prepared app version or artifact needs to be staged, uploaded, or submitted
+- You need to choose between `asc release stage`, `asc review submit`, and `asc publish appstore`
+- You need to assemble a multi-item submission containing Game Center or digital-goods versions
+
+For readiness failures, blocker diagnosis, monitoring, cancellation, or retry decisions, use `asc-submission-health`.
 
 **Example:**
 
 ```bash
-Check whether version 2.4.0 of my iOS app is ready for App Store submission, show the blockers, and tell me the next `asc` command to run.
+Stage version 2.4.0 with the selected build, show the dry-run plan, and submit it after confirmation.
 ```
 
 ### asc-signing-setup
@@ -221,17 +223,20 @@ Turn these release bullet points into polished What's New notes for en-US and lo
 
 ### asc-submission-health
 
-Preflight checks, digital-goods readiness validation, submission, and review monitoring.
+Diagnose submission blockers, route repairs, monitor review state, cancel unhealthy submissions, and decide when to retry.
 
 **Use when:**
-- You want to reduce submission failures
-- You need to track review status and re-submit safely
-- You're troubleshooting "version not in valid state" errors
+- You want to know whether an app can be submitted now
+- Validation reports metadata, compliance, digital-goods, availability, or App Privacy blockers
+- A version is not in a valid state
+- You need to monitor, cancel, repair, or safely retry a submission
+
+For staging, upload, publication, and submission execution, use `asc-release-flow`.
 
 **Example:**
 
 ```bash
-Preflight my iOS submission, check encryption/content-rights issues, and tell me what will block review.
+Validate version 2.4.0, classify every blocker, route the repairs, and tell me whether it is safe to retry.
 ```
 
 ### asc-testflight-orchestration
