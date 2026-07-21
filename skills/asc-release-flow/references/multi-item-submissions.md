@@ -50,7 +50,13 @@ asc review submissions-create --app "APP_ID" --platform IOS --output json
 
 Use the reused or newly created ID as `SUBMISSION_ID` below. If neither branch assigned one, do not continue.
 
-Add the app version first, followed by the resolved product and Game Center version items:
+List the draft's current items before attaching anything:
+
+```bash
+asc review items list --submission "SUBMISSION_ID" --paginate --output json
+```
+
+Compare each intended item type and resource ID with the returned relationships. Skip exact matches already attached to this draft. Add only missing items, with the app version first, followed by the resolved product and Game Center version items:
 
 ```bash
 asc review items add --submission "SUBMISSION_ID" --item-type appStoreVersions --item-id "VERSION_ID"
