@@ -1,0 +1,40 @@
+{
+  "name": "asc",
+  "version": "1.0.0",
+  "description": "Community-maintained Codex skills for shipping apps with the unofficial asc App Store Connect CLI.",
+  "author": {
+    "name": "Rudrank Riyam",
+    "url": "https://github.com/rudrankriyam"
+  },
+  "homepage": "https://github.com/rorkai/app-store-connect-cli-skills",
+  "repository": "https://github.com/rorkai/app-store-connect-cli-skills",
+  "license": "MIT",
+  "keywords": [
+    "app-store-connect",
+    "asc",
+    "ios",
+    "macos",
+    "testflight",
+    "app-store",
+    "developer-tools"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "App Store Connect CLI",
+    "shortDescription": "Ship apps with the asc CLI",
+    "longDescription": "Use the asc CLI to build and upload apps, manage TestFlight, synchronize App Store metadata, prepare releases, submit versions for review, configure signing, and operate Apple Ads workflows.",
+    "developerName": "Rudrank Riyam",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/rorkai/app-store-connect-cli-skills",
+    "defaultPrompt": [
+      "Prepare and submit my app to App Store review with asc",
+      "Upload this build to TestFlight and distribute it safely",
+      "Audit and sync my App Store metadata with asc"
+    ]
+  }
+}
