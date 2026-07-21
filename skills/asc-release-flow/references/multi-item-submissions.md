@@ -38,7 +38,7 @@ asc review submissions-list \
 
 Branch before writing:
 
-- If `asc-submission-health` or the caller handed off a `SUBMISSION_ID`, inspect it with `asc review submissions-get --id "SUBMISSION_ID" --include "items,appStoreVersionForReview" --output json`. Reuse it only when it is the intended `READY_FOR_REVIEW` draft. If it fails that check, stop; do not create another submission or add items.
+- If `asc-submission-health` or the caller handed off a `SUBMISSION_ID`, inspect it with `asc review submissions-get --id "SUBMISSION_ID" --include "items,appStoreVersionForReview" --output json`. Reuse it only when it is the intended `READY_FOR_REVIEW` draft. If it fails that check, stop and return the mismatch to `asc-submission-health` for diagnosis; do not create another submission or add items.
 - With no handed-off ID, if exactly one `READY_FOR_REVIEW` draft matches the intended release, capture and reuse its ID.
 - With no handed-off ID, if no matching draft or active submission exists for the intended version or review items, create one and capture its ID:
 
