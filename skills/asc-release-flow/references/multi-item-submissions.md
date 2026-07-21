@@ -25,11 +25,30 @@ Create only when the intended Game Center app version is absent.
 
 Do not create a review submission from the readiness gate. Start this phase only after the app version and build are staged and the user has selected the multi-item lane.
 
-Create one review submission and capture its ID:
+Inspect existing submissions before creating one:
+
+```bash
+asc review submissions-list \
+  --app "APP_ID" \
+  --platform IOS \
+  --include "items,appStoreVersionForReview" \
+  --paginate \
+  --output json
+```
+
+Branch before writing:
+
+- If `asc-submission-health` or the caller handed off a `SUBMISSION_ID`, inspect it with `asc review submissions-get --id "SUBMISSION_ID" --include "items,appStoreVersionForReview" --output json`. Reuse it only when it is the intended `READY_FOR_REVIEW` draft.
+- If exactly one `READY_FOR_REVIEW` draft matches the intended release, capture and reuse its ID.
+- If no matching draft or active submission exists, create one and capture its ID:
 
 ```bash
 asc review submissions-create --app "APP_ID" --platform IOS --output json
 ```
+
+- If more than one draft could match, or the intended version already has a submission in another active state, stop and diagnose through `asc-submission-health`. Do not create a second submission.
+
+Use the reused or newly created ID as `SUBMISSION_ID` below.
 
 Add the app version first, followed by the resolved product and Game Center version items:
 

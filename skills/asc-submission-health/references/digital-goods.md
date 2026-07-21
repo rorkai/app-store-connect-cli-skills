@@ -2,6 +2,8 @@
 
 Read this reference only when IAP or subscription validation fails, Apple requires a first-review attachment, or a versioned product must join an existing review submission.
 
+When work starts from an existing review draft, preserve its `SUBMISSION_ID` in the handoff to `asc-release-flow`. The release flow must inspect and reuse that draft rather than create another submission.
+
 ## Contents
 
 - [Run product validators](#run-product-validators)
