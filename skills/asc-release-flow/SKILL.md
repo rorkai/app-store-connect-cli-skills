@@ -16,7 +16,7 @@ This skill owns:
 - submitting a prepared version;
 - assembling a multi-item review submission.
 
-Use [references/multi-item-submissions.md](references/multi-item-submissions.md) for Game Center item preparation or attachment blockers. Stop and use `asc-submission-health` for other validation blockers, a stuck submission, cancellation, or retry decisions.
+Use [the preparation section](references/multi-item-submissions.md#prepare-every-item) for Game Center item preparation or attachment blockers. Use that reference's assembly and submission sections only after the app version is staged and the multi-item lane is selected. Stop and use `asc-submission-health` for other validation blockers, a stuck submission, cancellation, or retry decisions.
 
 ## Preconditions
 
@@ -51,9 +51,11 @@ Use strict mode when warnings must stop automation:
 asc validate --app "APP_ID" --version "1.2.3" --platform IOS --strict --output table
 ```
 
-If the app includes digital goods, use `asc-submission-health` to verify those resources before returning to this flow. If it includes Game Center items, continue with [references/multi-item-submissions.md](references/multi-item-submissions.md), which owns their preparation and attachment.
+Digital goods are a hard gate. If the release includes IAPs or subscriptions, stop and run the relevant product checks in `asc-submission-health`. Resume this flow only after those checks have no blocking issues and the intended product versions are prepared.
 
-If validation reports a Game Center item blocker, stop and use [references/multi-item-submissions.md](references/multi-item-submissions.md). For every other blocker, stop the release flow and use `asc-submission-health`. Do not bury unrelated remediation inside the release run.
+For Game Center items, complete only [Prepare every item](references/multi-item-submissions.md#prepare-every-item), then return to this flow. Do not assemble or submit the multi-item review submission during readiness.
+
+If app validation reports a Game Center item blocker, stop and use that preparation section. For every other blocker, stop the release flow and use `asc-submission-health`. Do not bury unrelated remediation inside the release run.
 
 ## Stage an existing build
 

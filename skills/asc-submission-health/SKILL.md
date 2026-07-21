@@ -83,7 +83,7 @@ A version is ready to return to `asc-release-flow` when:
 - `asc validate` has no blocking issues;
 - the attached build is `VALID`;
 - metadata, screenshots, app info, review details, content rights, encryption, age rating, pricing, and availability are resolved;
-- required digital-goods versions are prepared;
+- the relevant `asc validate iap` and/or `asc validate subscriptions` checks have no blocking issues, and the required digital-goods versions are prepared;
 - any Game Center version items have been checked through `asc-release-flow`'s multi-item submission reference;
 - App Privacy is confirmed or published.
 

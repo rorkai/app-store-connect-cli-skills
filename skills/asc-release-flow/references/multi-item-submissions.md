@@ -2,6 +2,12 @@
 
 Read this reference when one review submission must contain the app version plus versioned digital goods, Game Center components, or both.
 
+Follow only the section for the current phase:
+
+- During readiness, complete **Prepare every item**, then return to the main release flow.
+- Enter **Assemble the submission** only after the app version is staged and the multi-item lane is selected.
+- Enter **Submit** only after inspecting the assembled draft and obtaining confirmation.
+
 ## Prepare every item
 
 - Resolve the exact `VERSION_ID` and each product or component version ID.
@@ -16,6 +22,8 @@ asc game-center app-versions create --app-store-version-id "VERSION_ID" --output
 Create only when the intended Game Center app version is absent.
 
 ## Assemble the submission
+
+Do not create a review submission from the readiness gate. Start this phase only after the app version and build are staged and the user has selected the multi-item lane.
 
 Create one review submission and capture its ID:
 
