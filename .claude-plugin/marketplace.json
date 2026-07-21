@@ -1,0 +1,13 @@
+{
+  "name": "rorkai",
+  "owner": {
+    "name": "Rork"
+  },
+  "description": "Agent skills and tooling for App Store Connect workflows.",
+  "plugins": [
+    {
+      "name": "asc",
+      "source": "./"
+    }
+  ]
+}
