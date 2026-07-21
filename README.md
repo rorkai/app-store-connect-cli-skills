@@ -8,16 +8,35 @@ Skills follow the Agent Skills format.
 
 ## Installation
 
-Install this skill pack:
+Install the skills with `asc`:
 
 ```bash
 asc install-skills
 ```
 
-Or install directly from GitHub:
+Or install them directly from GitHub with the Agent Skills installer:
 
 ```bash
 npx skills add rorkai/app-store-connect-cli-skills
+```
+
+### Claude Code plugin
+
+This repository is also a Claude Code marketplace. Add it once, then install the `asc` plugin:
+
+```bash
+claude plugin marketplace add rorkai/app-store-connect-cli-skills
+claude plugin install asc@rorkai
+```
+
+### Codex plugin
+
+The repository includes a Codex plugin manifest and can be listed by a Codex plugin marketplace.
+Codex currently installs plugins from configured marketplaces, so use the Agent Skills installer
+until `asc` has a public marketplace listing:
+
+```bash
+npx skills add rorkai/app-store-connect-cli-skills --agent codex
 ```
 
 ## Available Skills
