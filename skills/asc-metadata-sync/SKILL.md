@@ -142,7 +142,7 @@ Use this only for existing fastlane-format trees:
 asc migrate export --app "APP_ID" --version-id "VERSION_ID" --output-dir "./fastlane"
 asc migrate validate --fastlane-dir "./fastlane"
 asc migrate import --app "APP_ID" --version-id "VERSION_ID" --fastlane-dir "./fastlane" --dry-run
-asc migrate import --app "APP_ID" --version-id "VERSION_ID" --fastlane-dir "./fastlane"
+asc migrate import --app "APP_ID" --version-id "VERSION_ID" --fastlane-dir "./fastlane" --confirm
 ```
 
 ## Character limits

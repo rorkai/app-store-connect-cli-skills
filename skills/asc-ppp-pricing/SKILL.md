@@ -131,6 +131,7 @@ Apply for real:
 asc subscriptions pricing prices import \
   --subscription-id "SUB_ID" \
   --input "./ppp-prices.csv" \
+  --confirm \
   --output table
 ```
 
