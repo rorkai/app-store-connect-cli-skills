@@ -1,4 +1,4 @@
-# asc cli skills
+# ASC CLI skills
 
 A collection of Agent Skills for shipping with the [asc cli](https://github.com/rorkai/App-Store-Connect-CLI) (`asc`). These skills help agents run builds, TestFlight, metadata, submissions, signing, and Apple Ads workflows.
 
