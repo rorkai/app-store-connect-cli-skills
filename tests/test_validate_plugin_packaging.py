@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 SCRIPT = Path(__file__).parents[1] / "scripts" / "validate-plugin-packaging.py"
@@ -68,6 +69,12 @@ class PackagingValidatorTests(unittest.TestCase):
 
     def test_valid_cross_host_package(self) -> None:
         self.assertEqual([], VALIDATOR.validate(self.root, 1))
+
+    def test_default_skill_count_matches_packaged_catalog(self) -> None:
+        with mock.patch("sys.argv", ["validate-plugin-packaging.py"]):
+            args = VALIDATOR.parse_args()
+
+        self.assertEqual(24, args.expected_skills)
 
     def test_rejects_cross_host_version_drift(self) -> None:
         self.claude["version"] = "1.1.0"

@@ -1,6 +1,6 @@
 # ASC CLI skills
 
-A collection of Agent Skills for shipping with the [asc cli](https://github.com/rorkai/App-Store-Connect-CLI) (`asc`). These skills help agents run builds, TestFlight, metadata, submissions, signing, and Apple Ads workflows.
+A collection of Agent Skills for shipping and operating apps with the [asc cli](https://github.com/rorkai/App-Store-Connect-CLI) (`asc`). These skills help agents run builds, TestFlight, metadata, submissions, signing, analytics, and Apple Ads workflows.
 
 This is a community-maintained, unofficial skill pack and is not affiliated with Apple.
 
@@ -221,6 +221,21 @@ Run an offline ASO audit on canonical App Store metadata under `./metadata` and 
 
 ```bash
 Audit ./metadata for ASO problems, then show the highest-value keyword gaps from Astro for my latest version.
+```
+
+### asc-app-dossier
+
+Build a source-backed acquisition or investor dossier from private App Store Connect analytics.
+
+**Use when:**
+- You need buyer diligence or investor traction material grounded in ASC data
+- You want analytics normalized into traceable facts before drafting claims
+- You need confidential and redacted dossier or slide-brief outputs
+
+**Example:**
+
+```bash
+Build acquisition and investor dossiers from my completed analytics reports, show every evidence gap, and prepare redacted slide briefs after I review the facts.
 ```
 
 ### asc-whats-new-writer
