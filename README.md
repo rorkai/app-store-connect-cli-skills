@@ -223,6 +223,21 @@ Run an offline ASO audit on canonical App Store metadata under `./metadata` and 
 Audit ./metadata for ASO problems, then show the highest-value keyword gaps from Astro for my latest version.
 ```
 
+### asc-analytics-reports
+
+Collect, download, and verify private App Store Connect Analytics reports with `asc`.
+
+**Use when:**
+- You need to find an existing analytics report request
+- You want report instances filtered by processing date or granularity
+- You need every report segment downloaded and checked against Apple's size and MD5 metadata
+
+**Example:**
+
+```bash
+Collect my latest weekly analytics reports, download every segment privately, and verify each file before analysis.
+```
+
 ### asc-whats-new-writer
 
 Generate engaging, localized App Store release notes from git log, bullet points, or free text using canonical metadata under `./metadata`.
