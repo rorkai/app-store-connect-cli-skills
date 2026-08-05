@@ -26,6 +26,10 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
    - `asc certificates create --certificate-type IOS_DISTRIBUTION --csr "./cert.csr"`
    - Or generate a key and CSR inline:
      - `asc certificates create --certificate-type IOS_DISTRIBUTION --generate-csr --key-out "./signing/dist.key" --csr-out "./signing/dist.csr"`
+   - For Wallet passes, create the Pass Type ID first, then create its certificate:
+     - `asc pass-type-ids create --identifier "pass.com.example" --name "Example Pass"`
+     - `asc certificates create --certificate-type PASS_TYPE_ID --pass-type-id "PASS_TYPE_ID" --csr "./pass.csr"`
+     - `asc pass-type-ids certificates list --pass-type-id "PASS_TYPE_ID" --paginate`
 4. Create a provisioning profile:
    - `asc profiles create --name "AppStore Profile" --profile-type IOS_APP_STORE --bundle "BUNDLE_ID" --certificate "CERT_ID"`
    - Include devices for development/ad-hoc:
