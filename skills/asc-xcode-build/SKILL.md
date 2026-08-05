@@ -34,6 +34,8 @@ asc xcode version edit --next-build-number --app "APP_ID" --platform IOS --outpu
 
 Version mutations validate the full change before writing and return structured output identifying the configurations and files changed. The editor follows recursive xcconfig includes and preserves unrelated project and xcconfig content. Use `asc builds next-build-number` separately when you only want to inspect the remote-safe value without changing the project.
 
+Version commands read project and xcconfig settings without launching Xcode. When those settings cannot resolve the version values, the default `--xcodebuild-settings-lookup auto` falls back to `xcodebuild -showBuildSettings` and warns on stderr. Use `--xcodebuild-settings-lookup never` in automation that must not launch Xcode implicitly.
+
 ## Preferred iOS/tvOS/visionOS build flow
 
 ### 1. Archive with asc
