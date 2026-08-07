@@ -75,17 +75,29 @@ asc --profile "$APPROVED_PROFILE" analytics request \
   --app "$APP_ID" \
   --access-type "$ACCESS_TYPE" \
   --reuse-existing \
-  --output json
+  --output json \
+  > "$ASC_ANALYTICS_DIR/request.json" \
+  2> "$ASC_ANALYTICS_DIR/request.stderr"
 ```
 
-Do not run that command without explicit approval.
+Do not run that command without explicit approval. Read the returned request ID
+from the private JSON response before continuing:
+
+```bash
+REQUEST_ID="$(jq -er '.requestId' "$ASC_ANALYTICS_DIR/request.json")"
+```
+
+When a request was created or reused with the approved profile, set
+`ANALYTICS_PROFILE="$APPROVED_PROFILE"`. For an existing request discovered
+with the read-only profile, set `ANALYTICS_PROFILE="$PROFILE"`. Use that same
+profile for every subsequent `analytics view` and `analytics download` call.
 
 ## 4. Discover and select report instances
 
 First retrieve report and instance metadata without segment URLs:
 
 ```bash
-asc --profile "$PROFILE" analytics view \
+asc --profile "$ANALYTICS_PROFILE" analytics view \
   --request-id "$REQUEST_ID" \
   --paginate \
   --output json \
@@ -95,14 +107,18 @@ asc --profile "$PROFILE" analytics view \
 
 Select an available `processingDate` and the granularity requested by the user.
 Accept `DAILY`, `WEEKLY`, and `MONTHLY`, individually or as a comma-separated
-list. Normalize user input to uppercase and preserve only requested values.
+list. Split the input on commas, trim each token, and normalize it to uppercase.
+Validate every token against that allowlist, including empty tokens. Report the
+invalid input and stop before running `analytics view`; never silently discard
+unsupported values or continue with an empty filter. After validation, remove
+duplicates and join the remaining values with commas.
 Treat `processingDate` as the date Apple processed the report, not necessarily
 the period represented by its rows.
 
 Retrieve the filtered inventory, including all segment metadata:
 
 ```bash
-asc --profile "$PROFILE" analytics view \
+asc --profile "$ANALYTICS_PROFILE" analytics view \
   --request-id "$REQUEST_ID" \
   --processing-date "$PROCESSING_DATE" \
   --granularity "$GRANULARITY" \
@@ -126,7 +142,7 @@ Download each segment by its request, instance, and segment IDs. Use a filename
 derived only from the segment ID and keep the compressed bytes intact:
 
 ```bash
-asc --profile "$PROFILE" analytics download \
+asc --profile "$ANALYTICS_PROFILE" analytics download \
   --request-id "$REQUEST_ID" \
   --instance-id "$INSTANCE_ID" \
   --segment-id "$SEGMENT_ID" \
