@@ -32,8 +32,9 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
   - `asc pricing availability edit --app "APP_ID" --territory "USA,GBR" --available true`
   - `asc app-setup availability edit --app "APP_ID" --territory "USA,GBR" --available true`
   - `asc xcode version edit --build-number "42"`
-- Use `asc pricing availability create` to initialize app availability before using the update-only `edit` command.
+- Use `asc pricing availability create` to initialize app availability before using the update-only `edit` command. If Apple rejects the public-API bootstrap, authenticate a web session and use `asc web apps availability create`, or configure Pricing and Availability in App Store Connect.
   - `asc pricing availability create --app "APP_ID" --territory "USA,GBR" --available true --available-in-new-territories true`
+  - `asc web apps availability create --app "APP_ID" --territory "USA,GBR" --available-in-new-territories true`
 - Keep `set` where the CLI intentionally models a higher-level replacement/configuration flow and `--help` still shows `set` as the canonical verb.
 
 ## Flag conventions

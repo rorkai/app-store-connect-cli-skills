@@ -101,7 +101,7 @@ asc pricing availability create \
   --available-in-new-territories true
 ```
 
-Use `asc pricing availability create` only for the first availability bootstrap. If app availability already exists, switch to `asc pricing availability edit --app "APP_ID" ...` for later territory changes.
+Use `asc pricing availability create` only for the first availability bootstrap. If Apple rejects that public-API bootstrap, authenticate a web session with `asc web auth login --apple-id "EMAIL"` and retry with `asc web apps availability create --app "APP_ID" --territory "USA,GBR" --available-in-new-territories true`, or configure Pricing and Availability in App Store Connect. If app availability already exists, switch to `asc pricing availability edit --app "APP_ID" ...` for later territory changes.
 
 ## Known UI Automation Issues
 
