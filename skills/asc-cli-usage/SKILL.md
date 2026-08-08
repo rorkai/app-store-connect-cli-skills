@@ -55,6 +55,10 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 - When permissions are unclear, inspect exact API key role coverage with `asc web auth capabilities`.
   - This lives under the web-session auth surface.
   - It can resolve the current local auth by default, or inspect a specific key with `--key-id`.
+- Create an App Store Connect team API key through a cached Apple Account web session with `asc web api-keys create`.
+  - An Account Holder or Admin session is required; use `asc web auth login --apple-id "user@example.com"` first when needed.
+  - The command saves the one-time P8 as `AuthKey_<KEY_ID>.p8` without printing its contents; choose an explicit private directory with `--output-dir`.
+  - Example: `asc web api-keys create --name "CI uploads" --role APP_MANAGER --output-dir "./keys" --output json`.
 
 ## Apple Ads
 - Use `asc ads --help` before choosing a command.

@@ -20,7 +20,7 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
    - `asc bundle-ids capabilities list --bundle "BUNDLE_ID"`
    - `asc bundle-ids capabilities add --bundle "BUNDLE_ID" --capability ICLOUD`
    - Add capability settings when required:
-     - `--settings '[{"key":"ICLOUD_VERSION","options":[{"key":"XCODE_13","enabled":true}]}]'`
+     - `--settings '[{"key":"ICLOUD_VERSION","options":[{"key":"XCODE_6","enabled":true}]}]'`
 3. Create a signing certificate:
    - `asc certificates list --certificate-type IOS_DISTRIBUTION`
    - `asc certificates create --certificate-type IOS_DISTRIBUTION --csr "./cert.csr"`
