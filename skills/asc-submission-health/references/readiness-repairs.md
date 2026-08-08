@@ -145,6 +145,17 @@ asc pricing availability create \
   --available-in-new-territories true
 ```
 
+If Apple rejects this public-API bootstrap, it has not configured availability. Authenticate a web session with `asc web auth login --apple-id "EMAIL"`, then retry through the web fallback:
+
+```bash
+asc web apps availability create \
+  --app "APP_ID" \
+  --territory "USA,GBR" \
+  --available-in-new-territories true
+```
+
+Alternatively, configure Pricing and Availability in App Store Connect.
+
 Use the edit command only after a record exists:
 
 ```bash
