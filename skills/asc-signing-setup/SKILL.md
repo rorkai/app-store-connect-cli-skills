@@ -25,8 +25,10 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
      user-owned web session and the Developer Portal Bundle ID resource ID:
      - `asc web bundle-ids capabilities enable --bundle-id "BUNDLE_RESOURCE_ID" --capability PRIVATE_CLOUD_COMPUTE --confirm`
      - This capability is not available through the public App Store Connect
-       capability enum. If the cached session cannot access Developer Portal,
-       reauthenticate with `asc web auth login --apple-id "user@example.com"`.
+     capability enum. If the cached session cannot access Developer Portal,
+       clear its scoped cache, then log in again with the same binary:
+       - `asc web auth logout --apple-id "user@example.com"`
+       - `asc web auth login --apple-id "user@example.com"`
 3. Create a signing certificate:
    - `asc certificates list --certificate-type IOS_DISTRIBUTION`
    - `asc certificates create --certificate-type IOS_DISTRIBUTION --csr "./cert.csr"`
