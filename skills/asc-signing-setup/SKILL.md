@@ -41,6 +41,8 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
    - `asc profiles inspect --path "./profiles/AppStore.mobileprovision" --entitlements --output markdown`
    - `asc profiles local install --path "./profiles/AppStore.mobileprovision"`
    - `asc profiles local list --output table`
+   - On macOS, the default directory follows the active Xcode: Xcode 16 or newer uses `~/Library/Developer/Xcode/UserData/Provisioning Profiles`; Xcode 15 or older uses `~/Library/MobileDevice/Provisioning Profiles`. Hosts without a full active Xcode fall back to the legacy directory and print a note to stderr.
+   - Pass `--install-dir` when automation must target a fixed directory.
 
 ## Rotation and cleanup
 - Revoke old certificates:
@@ -53,6 +55,7 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
 - Clean local Xcode provisioning profiles:
   - `asc profiles local clean --expired --dry-run`
   - `asc profiles local clean --expired --confirm`
+  - Check the resolved directory in the dry-run output before confirming, or pin it with `--install-dir`.
 
 ## Shared team storage with `asc signing sync`
 Use this when you want a lightweight, non-interactive alternative to fastlane match for encrypted git-backed certificate/profile storage.
