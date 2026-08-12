@@ -14,8 +14,8 @@ aggregate, or present the report contents as part of this skill.
 - Treat report inventories, signed URLs, downloaded segments, and identifiers as
   confidential business data.
 - Prefer an existing request. Creating a request changes App Store Connect state
-  and may require an Admin-authorized profile; obtain explicit user approval
-  before running `asc analytics request`.
+  and requires an Admin-authorized profile; obtain explicit user approval before
+  running `asc analytics request`.
 - Never delete or replace a request as part of collection.
 - Use `asc analytics download`; do not fetch or persist signed segment URLs
   separately.
@@ -139,14 +139,16 @@ segments and retain each segment's exact ID, `sizeInBytes`, and `checksum` for
 verification. Do not print `downloadUrl`.
 
 Download each segment by its request, instance, and segment IDs. Use a filename
-derived only from the segment ID and keep the compressed bytes intact:
+derived only from the segment ID and keep the compressed bytes intact. Analytics
+reports are tab-delimited text, so use `.txt.gz` rather than implying CSV:
 
 ```bash
+SEGMENT_FILE="$ASC_ANALYTICS_DIR/segments/$SEGMENT_ID.txt.gz"
 asc --profile "$ANALYTICS_PROFILE" analytics download \
   --request-id "$REQUEST_ID" \
   --instance-id "$INSTANCE_ID" \
   --segment-id "$SEGMENT_ID" \
-  --output "$ASC_ANALYTICS_DIR/segments/$SEGMENT_ID.csv.gz" \
+  --output "$SEGMENT_FILE" \
   > /dev/null \
   2>> "$ASC_ANALYTICS_DIR/download.stderr"
 ```
@@ -167,9 +169,12 @@ expected_md5="$(printf '%s' "$CHECKSUM" | tr '[:upper:]' '[:lower:]')"
 
 Require `actual_size` to equal `sizeInBytes` and `actual_md5` to equal
 `expected_md5`. On a mismatch, mark that segment failed, keep the raw error
-private, and do not claim a complete collection. Redownload only the failed
-segment using `asc analytics download`, then verify it again. Do not parse or
-analyze a file until verification succeeds.
+private, and do not claim a complete collection. `asc analytics download`
+refuses to overwrite an existing output, so retry the failed segment once to a
+new path such as `$ASC_ANALYTICS_DIR/segments/$SEGMENT_ID.retry-1.txt.gz`. Verify
+the retry independently and use it only if both checks pass. Keep the original
+failed file unless the user approves its deletion. Do not parse or analyze a
+file until verification succeeds.
 
 ## 7. Report the result
 
