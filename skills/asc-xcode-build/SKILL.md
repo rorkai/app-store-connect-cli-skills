@@ -36,6 +36,22 @@ Version mutations validate the full change before writing and return structured 
 
 Version commands read project and xcconfig settings without launching Xcode. When those settings cannot resolve the version values, the default `--xcodebuild-settings-lookup auto` falls back to `xcodebuild -showBuildSettings` and warns on stderr. Use `--xcodebuild-settings-lookup never` in automation that must not launch Xcode implicitly.
 
+## Compile without archiving
+
+Use `asc xcode build` for an ordinary simulator, device, or CI validation build. Provide exactly one project or workspace and a scheme.
+
+```bash
+asc xcode build \
+  --project "App.xcodeproj" \
+  --scheme "App" \
+  --destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=27.0" \
+  --no-code-signing \
+  --result-bundle-path ".asc/artifacts/App.xcresult" \
+  --output json
+```
+
+When `--derived-data-path` is omitted, asc uses a stable cache outside the source checkout. The result-bundle destination must not already exist. Xcode logs go to stderr and the structured result goes to stdout.
+
 ## Preferred iOS/tvOS/visionOS build flow
 
 ### 1. Archive with asc
