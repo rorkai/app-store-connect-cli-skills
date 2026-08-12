@@ -61,7 +61,7 @@ If app validation reports a Game Center item blocker, stop and use that preparat
 
 ## Stage an existing build
 
-Use `asc release stage` to ensure the version, apply or copy metadata, attach the selected build, and run validation without creating a review submission.
+Use `asc release stage` to verify the selected build belongs to the app before changing the version, apply or copy metadata, attach the build, and run validation without creating a review submission.
 
 Preview metadata-driven staging:
 
@@ -87,6 +87,12 @@ asc release stage \
 ```
 
 Use `--copy-metadata-from "1.2.2"` instead of `--metadata-dir` when carrying localization metadata forward. Add `--strict-validate` when warnings should fail the stage.
+
+If the metadata plan contains deletes, the dry run and confirmed run both require `--allow-deletes`. Review those deletes first; the flag also disables fallback to an existing locale when that locale is absent locally.
+
+Use `--routing-coverage-file "./coverage.geojson"` when the release includes routing app coverage. This experimental step validates the GeoJSON before mutation and stages it before readiness checks.
+
+Structured output includes a `validate_build` step at the start of `steps[]`. Match steps by name rather than array position.
 
 ## Submit a prepared version
 

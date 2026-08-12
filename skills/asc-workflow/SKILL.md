@@ -75,6 +75,8 @@ Do not pass extra `KEY:VALUE` params with `--resume`; the saved workflow file, p
   - `if` conditional var name
   - `with` env overrides for workflow-call steps
   - `outputs` map for JSON stdout extraction from named run steps
+  - `retry` fixed-delay retry policy for a `run` step
+  - `timeout` positive per-attempt duration for a `run` step
 
 ## Outputs
 
@@ -92,6 +94,26 @@ Rules:
 - Outputs are allowed on `run` steps, not workflow-call steps.
 - Output-producing names must be unique across workflows that can execute together in the same run graph.
 - Persisted outputs are stored in workflow run state, so do not map secrets into outputs.
+
+## Bounded retry and timeout
+
+Add retry only to commands you have determined are safe to repeat. The runner does not classify commands or retry mutations on its own.
+
+```json
+{
+  "name": "resolve_build",
+  "run": "asc builds info --app $APP_ID --latest --platform IOS --output json",
+  "retry": {
+    "max_attempts": 3,
+    "delay": "5s"
+  },
+  "timeout": "2m"
+}
+```
+
+`retry.max_attempts` counts the first attempt and must be between 2 and 100. Retry delays and timeouts must be positive durations no longer than 24 hours. Both fields work only on `run` steps, not workflow calls or lifecycle hooks.
+
+A timeout without retry is terminal because the command may have completed remotely. Pairing retry and timeout is the explicit signal that another attempt is safe. Resume requires either a successful checkpoint or a retry-enabled failed step; output-extraction failures cannot be resumed.
 
 ## Runtime params
 
