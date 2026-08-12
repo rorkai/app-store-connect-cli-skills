@@ -145,6 +145,12 @@ asc migrate import --app "APP_ID" --version-id "VERSION_ID" --fastlane-dir "./fa
 asc migrate import --app "APP_ID" --version-id "VERSION_ID" --fastlane-dir "./fastlane" --confirm
 ```
 
+Deliverfile `metadata_path` and `screenshots_path` values take precedence and resolve relative to the Deliverfile. With `--fastlane-dir "./fastlane"`, use `metadata_path "./metadata"` rather than `"./fastlane/metadata"`; the latter resolves to `./fastlane/fastlane/metadata`. Fix stale values in the Deliverfile, or remove them to use the conventional `metadata/` and `screenshots/` directories.
+
+Paths outside the selected Fastlane directory fail unless the operator explicitly trusts them with `--allow-external-metadata` or `--allow-external-screenshots`. Keep those flags off for untrusted imports.
+
+Inspect the validation body as well as the process exit: `asc migrate validate` can return a report with `valid: false` and a nonzero `errorCount` while exiting 0. A confirmed import can print `status: "partial"` with completed stages and failure details while exiting nonzero, so non-empty stdout does not mean success.
+
 ## Character limits
 
 | Field | Limit |
