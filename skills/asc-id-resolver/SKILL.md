@@ -63,7 +63,7 @@ Resolve child localization or image IDs from the corresponding version subtree:
 - `asc testflight pre-release list --app "APP_ID" --platform IOS --paginate`
 
 ## Review submission IDs
-- `asc review submissions-list --app "APP_ID" --paginate`
+- `asc review submissions list --app "APP_ID" --paginate`
 
 ## Output tips
 - Output defaults are TTY-aware: table in a terminal and minified JSON in pipes

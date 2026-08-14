@@ -28,7 +28,7 @@ Do not create a review submission from the readiness gate. Start this phase only
 Inspect existing submissions before creating one:
 
 ```bash
-asc review submissions-list \
+asc review submissions list \
   --app "APP_ID" \
   --platform IOS \
   --include "items,appStoreVersionForReview" \
