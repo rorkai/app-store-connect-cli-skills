@@ -48,7 +48,7 @@ Guidance for running `asc` commands (canonical verbs, flags, pagination, output,
 **Use when:**
 - You need the correct `asc` command or flag combination
 - You want JSON-first output and pagination tips for automation
-- You need Apple Ads command, auth, org, payload, or pagination guidance
+- You need Apple Ads command, auth, ad-account, org, payload, or pagination guidance
 
 **Example:**
 
@@ -58,17 +58,18 @@ Find the right asc command to list all builds for app 123456789 as JSON and pagi
 
 ### asc-apple-ads
 
-Apple Ads auth, org lookup, campaigns, ad groups, ads, keywords, reports, raw API calls, and safe live testing.
+Apple Ads auth and account discovery, Platform API v1 campaigns, targeting, reports, assets, guarded mutations, raw calls, and v5 migration.
 
 **Use when:**
 - You need to read or change Apple Ads resources with `asc ads`
-- You need Apple Ads OAuth, profile, or `ASC_ADS_*` guidance
+- You need Apple Ads OAuth, profile, ad-account context, or `ASC_ADS_*` guidance
 - You need a safe read-first plan before mutating a live Ads account
+- You need to migrate deprecated `asc ads v5` automation to Platform API v1
 
 **Example:**
 
 ```bash
-Find my Apple Ads org, list campaigns as JSON, and draft a safe plan before creating any test campaign.
+Discover my Apple Ads ad account, query campaigns through Platform API v1, and draft a paused test plan before creating anything.
 ```
 
 ### asc-workflow
@@ -132,6 +133,21 @@ the experimental `asc distribute` workflow.
 
 ```bash
 Plan a private release-testing install from this Xcode archive, show me the exact effects, and apply only after I approve the plan hash.
+```
+
+### asc-screenshot-resize
+
+Resize and validate App Store screenshots using the current size catalog from `asc screenshots sizes` and macOS `sips`.
+
+**Use when:**
+- You need to inspect the screenshot dimensions Apple currently accepts
+- You need to remove alpha or resize screenshots before upload
+- You want local validation against an App Store screenshot device type
+
+**Example:**
+
+```bash
+Validate these iPhone screenshots, resize only the invalid files, and verify the results before upload.
 ```
 
 ### asc-shots-pipeline
