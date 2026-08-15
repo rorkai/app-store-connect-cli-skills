@@ -29,6 +29,15 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
        clear its scoped cache, then log in again with the same binary:
        - `asc web auth logout --apple-id "user@example.com"`
        - `asc web auth login --apple-id "user@example.com"`
+   - For App Groups, the public API can enable `APP_GROUPS` but cannot create or
+     associate App Group resources. Use an Account Holder or Admin web session:
+     - `asc web app-groups list --paginate --output table`
+     - `asc web app-groups create --name "Example Shared" --identifier "group.com.example.app.shared" --confirm`
+     - `asc web app-groups assign --group "GROUP_RESOURCE_ID" --bundle-id "BUNDLE_RESOURCE_ID" --confirm`
+     - Resolve the opaque group ID with `asc web app-groups list` and the opaque
+       Bundle ID resource ID with `asc bundle-ids list`. A changed assignment
+       invalidates provisioning profiles containing that App ID, so regenerate
+       affected profiles before the next signed build.
 3. Create a signing certificate:
    - `asc certificates list --certificate-type IOS_DISTRIBUTION`
    - `asc certificates create --certificate-type IOS_DISTRIBUTION --csr "./cert.csr"`
@@ -69,24 +78,87 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
 Use this when you want a lightweight, non-interactive alternative to fastlane match for encrypted git-backed certificate/profile storage.
 
 ```bash
-# Push current ASC signing assets into an encrypted git repo
+# Protect secret inputs before use
+chmod 600 "./signing-sync-password" "./distribution.p12" "./distribution-p12-password"
+
+# Push a usable private identity with its matching certificate and profile
 asc signing sync push \
   --bundle-id "com.example.app" \
-  --profile-type IOS_APP_STORE \
+  --profile-type IOS_APP_ADHOC \
   --repo "git@github.com:team/certs.git" \
-  --password "$MATCH_PASSWORD"
+  --password-file "./signing-sync-password" \
+  --identity "./distribution.p12" \
+  --identity-password-file "./distribution-p12-password" \
+  --output json
 
 # Pull and decrypt them into a local directory
 asc signing sync pull \
   --repo "git@github.com:team/certs.git" \
-  --password "$MATCH_PASSWORD" \
-  --output-dir "./signing"
+  --password-file "./signing-sync-password" \
+  --output-dir "./signing" \
+  --output json
 ```
 
 Notes:
-- `--password` falls back to `ASC_MATCH_PASSWORD`.
-- The encrypted repo follows a familiar match-style git layout for certs and profiles.
-- `pull` writes files to disk; keychain import or profile installation is a separate step.
+- App Store Connect never returns a private key. Supply the local PKCS#12 with
+  `--identity`, or use `--private-key` with `--identity-sha256` to select its
+  matching App Store Connect certificate. A multi-identity PKCS#12 also needs
+  `--identity-sha256`.
+- Prefer `--password-file`; `ASC_SIGNING_SYNC_PASSWORD` is the non-file fallback.
+  `--password` and `ASC_MATCH_PASSWORD` are deprecated during 4.x and will be
+  rejected in 5.0.0.
+- Certificate/profile-only sync remains supported but reports
+  `identityPresent: false`; it is not a usable signing identity by itself.
+- `pull` reports private identities in `sensitiveFiles` and writes them mode
+  `0600`. Importing or using the pulled identity remains a separate explicit step.
+- Private identity sync rejects `MAC_APP_DIRECT` and
+  `MAC_CATALYST_APP_DIRECT`; certificate/profile-only sync remains available.
+
+## Reconcile ad hoc devices and profiles
+
+Use the experimental reconcile workflow for deterministic, additive changes
+derived from an Xcode archive and a protected desired-devices file:
+
+```bash
+asc signing reconcile plan \
+  --archive-path ".asc/artifacts/App.xcarchive" \
+  --devices-file ".asc/distribution/devices.json" \
+  --output json
+
+asc signing reconcile apply \
+  --plan ".asc/distribution/signing/plan.json" \
+  --confirm \
+  --output json
+```
+
+Planning performs no mutation and may return `ready: false`. Apply can register
+missing devices, create safe baseline App IDs, and create successor ad hoc
+profiles; it never deletes or patches resources, enables capabilities, or
+creates certificates. Review the plan before `--confirm`. Use the
+`asc-ad-hoc-distribution` skill when these signing effects should be bound into
+an end-to-end distribution plan hash.
+
+## Run one command with an ephemeral identity
+
+On macOS, avoid persistent login-keychain and profile changes by wrapping the
+child command:
+
+```bash
+asc signing run \
+  --identity "./signing/App.p12" \
+  --identity-password-file "./signing/App-password" \
+  --profile "./signing/App.mobileprovision" \
+  --receipt ".asc/distribution/signing-run.json" \
+  -- xcodebuild -exportArchive \
+    -archivePath ".asc/artifacts/App.xcarchive" \
+    -exportPath ".asc/artifacts/release-testing" \
+    -exportOptionsPlist ".asc/ExportOptions.release-testing.plist"
+```
+
+The command runs directly without a shell, preserves the child's exit code,
+uses an isolated temporary keychain, and cleans up its temporary profile. It
+does not print success data, so the child owns stdout. Never pass identity
+passwords inline.
 
 ## Notes
 - Always check `--help` for the exact enum values (certificate types, profile types).

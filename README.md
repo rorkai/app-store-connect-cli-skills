@@ -109,12 +109,29 @@ Build, archive, generate export options, export, and manage Xcode version/build 
 - You need to create an IPA or PKG for upload
 - You're setting up CI/CD build pipelines
 - You need to generate or customize ExportOptions.plist
+- You need a modern `release-testing` IPA for registered devices
 - You're troubleshooting encryption compliance issues
 
 **Example:**
 
 ```bash
 Archive and export my macOS app as a PKG I can upload to App Store Connect.
+```
+
+### asc-ad-hoc-distribution
+
+Prepare and publish verified private iOS installs for registered devices with
+the experimental `asc distribute` workflow.
+
+**Use when:**
+- You need to ship a build outside TestFlight to a controlled device list
+- You want a read-only plan before additive signing and storage mutations
+- You need to resume or live-verify a private S3-compatible distribution run
+
+**Example:**
+
+```bash
+Plan a private release-testing install from this Xcode archive, show me the exact effects, and apply only after I approve the plan hash.
 ```
 
 ### asc-shots-pipeline
@@ -156,6 +173,7 @@ Bundle IDs, capabilities, certificates, provisioning profiles, and encrypted sig
 **Use when:**
 - You are onboarding a new app or bundle ID
 - You need to create or rotate signing assets
+- You need to sync a private identity, reconcile ad hoc profiles, or run a command in an isolated signing environment
 
 **Example:**
 
