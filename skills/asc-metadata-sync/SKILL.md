@@ -77,7 +77,7 @@ asc metadata status --review-dir ".asc/metadata/review" --output table
 asc metadata apply --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata" --review-dir ".asc/metadata/review" --confirm
 ```
 
-Use `asc metadata approve --key "version:en-US:whatsNew"` or `--scope app-info,version` when the user wants selective approval artifacts before the guarded apply.
+Use `asc metadata approve --key "version:1.2.3:en-US:whatsNew"` or `--scope app-info,version` when the user wants selective approval artifacts before the guarded apply. Version-scoped keys include the App Store version string.
 
 ## Keyword-only workflow
 

@@ -63,12 +63,12 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 ## Apple Ads
 - Use `asc ads --help` before choosing a command.
 - Apple Ads uses `asc ads auth`, `--ads-profile`, and `ASC_ADS_*` variables. It does not use App Store Connect API credentials.
-- Resolve org access with `asc ads acls --output json` unless the org ID is already known.
-- Most endpoint commands need `--org` or `ASC_ADS_ORG_ID`.
-- Body commands use `--file` with Apple Ads JSON payloads. Object endpoints need a JSON object. Bulk endpoints often need a JSON array.
-- Use `--paginate` only where help shows it. Reporting and selector payloads carry pagination inside the JSON file.
-- Destructive commands and bulk delete commands require `--confirm`.
-- For live mutation tests, create paused resources with a clear test name and delete the parent campaign when done.
+- Direct resource commands use Platform API v1 with `--ad-account` or `ASC_ADS_AD_ACCOUNT_ID`. Deprecated Campaign Management API v5 commands live under `asc ads v5` and use `--org` or `ASC_ADS_ORG_ID`; never substitute one ID for the other.
+- Discover ad-account access with `asc ads auth discover --output json` or inspect one ACL response with `asc ads acls list --output json`.
+- Body commands use `--file` with the exact schema named by the leaf help. V1 query filters use singular `value`, and bulk bodies may use wrapper objects rather than v5 arrays.
+- Apple Ads resource commands emit JSON. Use `--paginate` only where help shows it; reports and most query bodies carry pagination inside the JSON file.
+- Deletes and spend-, billing-, delivery-, targeting-, or access-sensitive mutations require `--confirm`. An explicitly paused campaign create is the main documented safe exception.
+- For live mutation tests, create paused resources with a clear test name, save every ID, pause spend-bearing resources first, and delete only resources created by the test.
 
 ## Timeouts
 - `ASC_TIMEOUT` / `ASC_TIMEOUT_SECONDS` control request timeouts.

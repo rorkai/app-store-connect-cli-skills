@@ -15,7 +15,7 @@ Use this skill to pull English (or any source locale) App Store metadata, transl
   - `asc localizations upload --help`
   - `asc apps info edit --help`
 - Prefer explicit long flags (`--app`, `--version`, `--version-id`, `--type`, `--app-info`).
-- Default output is JSON; use `--output table` only for human verification steps.
+- Output defaults are TTY-aware: table in interactive terminals and JSON in CI or other non-interactive contexts. Use explicit `--output` when the format matters.
 - Prefer deterministic ID-based operations. Do not "pick the first row" via `head -1` unless the user explicitly agrees.
 
 ## Preconditions
@@ -27,10 +27,11 @@ Use this skill to pull English (or any source locale) App Store metadata, transl
 
 App Store Connect locales for version and app-info localizations:
 ```
-ar-SA, ca, cs, da, de-DE, el, en-AU, en-CA, en-GB, en-US,
-es-ES, es-MX, fi, fr-CA, fr-FR, he, hi, hr, hu, id, it,
-ja, ko, ms, nl-NL, no, pl, pt-BR, pt-PT, ro, ru, sk,
-sv, th, tr, uk, vi, zh-Hans, zh-Hant
+ar-SA, bn-BD, ca, cs, da, de-DE, el, en-AU, en-CA, en-GB,
+en-US, es-ES, es-MX, fi, fr-CA, fr-FR, gu-IN, he, hi, hr,
+hu, id, it, ja, kn-IN, ko, ml-IN, mr-IN, ms, nl-NL, no,
+or-IN, pa-IN, pl, pt-BR, pt-PT, ro, ru, sk, sl-SI, sv,
+ta-IN, te-IN, th, tr, uk, ur-PK, vi, zh-Hans, zh-Hant
 ```
 
 ## Two Types of Metadata

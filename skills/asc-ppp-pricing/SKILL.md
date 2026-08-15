@@ -190,7 +190,7 @@ verification enabled to recheck the parent, pricing, screenshot, and
 availability state.
 
 ### Subscription availability
-If you need to explicitly enable territories for an existing subscription, use the pricing availability family.
+The underlying subscription-availability resource is deprecated in App Store Connect API 4.4. Keep this command family only for compatibility when ordinary upfront territory availability still needs it; Apple does not provide a one-for-one replacement for that case. For Monthly with 12-Month Commitment, use `asc subscriptions pricing monthly-commitment enable|disable|list` instead.
 
 ```bash
 asc subscriptions pricing availability edit --subscription-id "SUB_ID" --territories "USA,CAN,IND,BRA"
