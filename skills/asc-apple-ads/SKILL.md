@@ -13,6 +13,7 @@ Run Apple Ads work through `asc ads`. Apple Ads credentials are separate from Ap
 - Deprecated Campaign Management API v5 commands live under `asc ads v5 ...` and use an organization ID. Apple retires v5 on January 26, 2027.
 - Never substitute an org ID for an ad account ID. The CLI keeps them separate.
 - Run the exact leaf command with `--help` before building a request file. Platform v1 payloads and response envelopes differ from v5; the CLI does not translate them.
+- For non-interactive pipelines, pass `--file -` to read a JSON request body from stdin; the CLI rejects it when stdin is a terminal.
 - Resource, report, upload, and raw commands emit lossless JSON. Use `jq` for projections instead of asking for table or markdown output.
 
 ## Authenticate and pin the account
