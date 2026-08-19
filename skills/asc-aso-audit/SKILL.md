@@ -64,6 +64,33 @@ Use tags as context only:
 - If tags point to an unintended category or use case, recommend metadata/category changes that may improve future classification.
 - Do not promise that changing metadata will immediately change Apple-generated tags.
 
+### Optional: Official Apple Search Plan
+
+When both App Store Connect and Apple Ads credentials are configured, use the
+experimental, read-only plan to join the selected metadata with official paid
+search evidence:
+
+```bash
+asc optimize search plan \
+  --app "APP_ID" \
+  --version "1.2.3" \
+  --ad-account "AD_ACCOUNT_ID" \
+  --country "US" \
+  --genre "PRODUCTIVITY_UTILITIES" \
+  --locale "en-US" \
+  --out-dir ".asc/optimization/1.2.3" \
+  --output markdown
+```
+
+- Authenticate App Store Connect with `asc auth` and Apple Ads separately with
+  `asc ads auth login`; the two credential sets are independent.
+- Treat the generated CSV and JSON files as review artifacts. The command does
+  not apply metadata, exact keywords, or negative keywords, and partial Apple
+  Ads source failures stay visible in the report.
+- Keep Apple's popularity, app-specific paid reach, paid search outcomes, and
+  metadata coverage distinct. Do not infer organic rank or keyword difficulty
+  from this plan.
+
 ### 2. Underutilized Fields
 
 Flag fields using less than their recommended minimum:
