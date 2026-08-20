@@ -33,5 +33,6 @@ Use this skill to manage build state, processing, and retention.
   - `asc builds expire --build-id "BUILD_ID" --confirm`
 
 ## Notes
-- `asc builds upload` prepares upload operations only; use `asc publish` for end-to-end flows.
+- `asc builds upload` uploads and commits an IPA or PKG. Use `asc publish` when
+  the workflow must also distribute to TestFlight or stage an App Store release.
 - For long processing times, use `--wait`, `--poll-interval`, and `--timeout` where supported.
