@@ -125,7 +125,9 @@ Choose how a desired price resolves when Apple does not offer it:
 - `up` chooses the smallest available amount at or above the calculation.
 - `down` chooses the largest available amount at or below the calculation.
 
-After reviewing every territory, apply the same plan explicitly:
+The confirmed command fetches current prices and builds a fresh plan; it does
+not reuse the preceding dry-run result. When the applied values must match the
+reviewed values, rerun `--dry-run` immediately before confirming, then apply:
 
 ```bash
 asc subscriptions pricing derive \
@@ -144,7 +146,9 @@ prices that already match, and verifies applied prices by reading them back.
 Use `--territory "SWE"` for a focused preview or staged one-territory update;
 omit it to derive every current source territory.
 Approved or live targets are scheduled for tomorrow by default when no
-`--start-date` is supplied; use an explicit date when coordinating a rollout.
+`--start-date` is supplied because `--auto-start-date` defaults to true. Pass
+`--auto-start-date=false` to apply immediately, or use an explicit date when
+coordinating a rollout.
 The command does not change subscription sale availability.
 
 ### Preferred bulk PPP update: import a CSV with dry run
