@@ -102,6 +102,55 @@ asc subscriptions pricing prices list --subscription-id "SUB_ID" --paginate
 
 Use `summary` for quick before/after spot checks and `prices list` when you need raw price records.
 
+### Derive one subscription's localized prices from another
+Use `derive` when a target subscription should stay near a fixed multiple of a
+source subscription in every territory, such as yearly pricing near 10 times
+monthly pricing. Apple ladders scale unevenly across territories, so preview
+the selected target points and achieved multiples before applying them.
+
+```bash
+asc subscriptions pricing derive \
+  --source-subscription-id "MONTHLY_SUB_ID" \
+  --target-subscription-id "YEARLY_SUB_ID" \
+  --multiplier "10" \
+  --round nearest \
+  --dry-run \
+  --output table
+```
+
+Choose how a desired price resolves when Apple does not offer it:
+
+- `exact` fails unless the calculated amount exists on the target ladder.
+- `nearest` chooses the closest amount; an exact tie chooses the lower one.
+- `up` chooses the smallest available amount at or above the calculation.
+- `down` chooses the largest available amount at or below the calculation.
+
+The confirmed command fetches current prices and builds a fresh plan; it does
+not reuse the preceding dry-run result. When the applied values must match the
+reviewed values, rerun `--dry-run` immediately before confirming, then apply:
+
+```bash
+asc subscriptions pricing derive \
+  --source-subscription-id "MONTHLY_SUB_ID" \
+  --target-subscription-id "YEARLY_SUB_ID" \
+  --multiplier "10" \
+  --round nearest \
+  --confirm \
+  --output table
+```
+
+The source and target must be distinct subscriptions with existing standard
+`UPFRONT` prices. The operation is a one-time snapshot, not a persistent link.
+It fails closed before mutation when any territory cannot resolve, skips target
+prices that already match, and verifies applied prices by reading them back.
+Use `--territory "SWE"` for a focused preview or staged one-territory update;
+omit it to derive every current source territory.
+Approved or live targets are scheduled for tomorrow by default when no
+`--start-date` is supplied because `--auto-start-date` defaults to true. Pass
+`--auto-start-date=false` to apply immediately, or use an explicit date when
+coordinating a rollout.
+The command does not change subscription sale availability.
+
 ### Preferred bulk PPP update: import a CSV with dry run
 For broad PPP rollouts, prefer the subscription pricing import command instead of manually adding territory prices one by one.
 
