@@ -16,7 +16,9 @@ This skill owns:
 - submitting a prepared version;
 - assembling a multi-item review submission.
 
-Use [the preparation section](references/multi-item-submissions.md#prepare-every-item) for Game Center item preparation or attachment blockers. Use that reference's assembly and submission sections only after the app version is staged and the multi-item lane is selected. Stop and use `asc-submission-health` for other validation blockers, a stuck submission, cancellation, or retry decisions.
+Use [the preparation section](references/multi-item-submissions.md#prepare-every-item) for Game Center item preparation or attachment blockers. Use that reference's assembly and submission sections only after the app version is staged and the multi-item lane is selected. Switch to `asc-submission-health` for other validation blockers, a stuck submission, cancellation, or retry decisions.
+
+Switch skills within the current task, preserving resolved targets, authorization, and verified progress. A failing gate blocks dependent mutations, not diagnosis or independent authorized work. Continue authorized repairs and resume this flow; request new authority only when repairs exceed the agreed scope.
 
 ## Preconditions
 
@@ -57,7 +59,7 @@ Digital goods are a hard gate. If the release includes IAPs or subscriptions, st
 
 For Game Center items, complete only [Prepare every item](references/multi-item-submissions.md#prepare-every-item), then return to this flow. Do not assemble or submit the multi-item review submission during readiness.
 
-If app validation reports a Game Center item blocker, stop and use that preparation section. If the only blocker is an unattached build in the staging lane, continue to the staging section. For every other blocker, stop the release flow and use `asc-submission-health`. Do not bury unrelated remediation inside the release run.
+If app validation reports a Game Center item blocker, stop and use that preparation section. If the only blocker is an unattached build in the staging lane, continue to the staging section. For every other blocker, pause dependent release actions and use `asc-submission-health`; resume after authorized repairs pass validation.
 
 ## Stage an existing build
 
@@ -147,7 +149,7 @@ Report:
 
 - the app, version, platform, build, and submission IDs;
 - which lane ran and whether it completed;
-- every mutation confirmed by the user;
+- mutations performed under the user's authorization;
 - the exact command to monitor the resulting submission.
 
 Use `asc-submission-health` for monitoring, cancellation, rejection diagnosis, or retry decisions.

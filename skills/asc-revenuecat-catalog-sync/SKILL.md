@@ -47,7 +47,7 @@ Use this skill to keep App Store Connect (ASC) and RevenueCat aligned, including
    - missing in ASC
    - missing in RevenueCat
    - mapping conflicts (identifier/type/app mismatch)
-4. Present a plan and wait for confirmation.
+4. Present the plan. Audit-only requests finish with findings; apply requests require approval covering the complete current diff. Reuse prior approval if the refreshed diff is unchanged.
 
 ### 2) Apply mode (explicit)
 Execute approved actions in this order:
@@ -288,7 +288,7 @@ Failures:
 
 ## Agent behavior
 - Always run audit first, even in apply mode.
-- Ask for confirmation before create/update operations.
+- Reuse approval covering the complete current diff for its create/update operations. Ask again only when approval is absent or additional or materially changed actions fall outside it.
 - Match by `store_identifier` first.
 - Use full pagination (`--paginate` for ASC, `starting_after` for RevenueCat tools).
 - Continue processing after per-item failures and report all failures together.

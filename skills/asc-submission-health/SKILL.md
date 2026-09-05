@@ -16,14 +16,14 @@ This skill owns:
 - review status and history;
 - cancellation and retry decisions.
 
-Do not stage, upload, publish, or submit a healthy release from this skill.
+Use `asc-release-flow` for staging, upload, publication, and submission. Switching skills continues the current task with its resolved targets, authorization, and verified progress; it does not require the user to restart the workflow. Continue authorized repairs and return to release execution when healthy. Ask for new authority only when a repair exceeds scope.
 
 ## Answer order
 
 1. State whether the version is ready, blocked, or already under review.
 2. Name each blocker and the evidence that proves it.
 3. Separate public-API repairs from web-session and manual work.
-4. Give one next command. Do not dump the entire repair catalog.
+4. Run the read-only checks needed to establish the diagnosis. For diagnosis-only requests, report the evidence and one proposed repair command without executing that repair. For authorized execution, continue the repair queue and report completed work and remaining blockers.
 
 ## Establish the target
 

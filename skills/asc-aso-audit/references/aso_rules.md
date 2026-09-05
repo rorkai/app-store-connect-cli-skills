@@ -36,7 +36,7 @@ Rules enforced by the asc-aso-audit skill. Each rule links to the check that tes
 - **Localize keywords per market** — do not just translate your primary keywords. Research what users in each locale actually search for.
 - **English (US) keywords may carry into other English-speaking storefronts** but dedicated localization always outperforms.
 - **Identical keyword fields across locales** usually indicates untranslated/unlocalized metadata.
-- **Track keywords in each locale's store** — keyword popularity varies dramatically across territories. A keyword with 70 popularity in the US store may have 5 popularity in France. Use Astro `add_keywords` to set up tracking per store before analyzing.
+- **Track keywords in each locale's store** — keyword popularity varies dramatically across territories. A keyword with 70 popularity in the US store may have 5 popularity in France. Query existing Astro tracking; report and skip untracked stores during an audit. Use `add_keywords` only when tracking setup is explicitly authorized.
 - **Use competitor analysis per store** — top competitors differ by market. Run `extract_competitors_keywords` with locale-relevant competitor apps.
 
 ## Non-Latin Script Rules
