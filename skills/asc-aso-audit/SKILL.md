@@ -166,7 +166,7 @@ If Astro MCP is available and the app is tracked, run keyword gap analysis. **Ru
 
 1. **Get current keywords**: Call `get_app_keywords` with the app ID to retrieve tracked keywords and their current rankings.
 
-2. **Ensure multi-store tracking**: For each locale with a corresponding App Store territory (e.g., `ar-SA` → Saudi Arabia, `fr-FR` → France, `tr` → Turkey), use `add_keywords` to add keyword tracking in that store. Without this, `search_rankings` returns empty for non-US stores.
+2. **Check multi-store tracking**: Query existing tracking for each locale's App Store territory. Report untracked stores as unavailable and continue the audit. Use `add_keywords` only when the user separately authorizes tracking setup; empty rankings for an untracked store do not prove poor performance.
 
 3. **Extract competitor keywords**: Call `extract_competitors_keywords` with 3-5 top competitor app IDs to find keyword gaps. This is the highest-value Astro tool — it reveals keywords competitors rank for that you don't. Run this per store when possible.
 
@@ -190,7 +190,7 @@ Flag high-value combos in recommendations.
 
 - Astro MCP not connected → skip with note: "Connect Astro MCP for keyword gap analysis"
 - App not tracked in Astro → skip with note: "Add app to Astro with `mcp__astro__add_app` for gap analysis"
-- Store not tracked for a locale → add tracking with `add_keywords` before querying
+- Store not tracked for a locale → report the gap and skip its rankings; tracking setup requires separate authorization
 
 ## Output Format
 
