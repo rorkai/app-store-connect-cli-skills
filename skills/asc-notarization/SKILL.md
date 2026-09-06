@@ -23,28 +23,16 @@ security find-identity -v -p codesigning | grep "Developer ID Application"
 
 If no identity is found, create one at https://developer.apple.com/account/resources/certificates/add (the App Store Connect API does not support creating Developer ID certificates).
 
-### Fix Broken Trust Settings
+### Inspect Trust Settings
 
 If `codesign` or `xcodebuild` fails with "Invalid trust settings" or "errSecInternalComponent", the certificate may have custom trust overrides that break the chain:
 
 ```bash
 # Check for custom trust settings
 security dump-trust-settings 2>&1 | grep -A1 "Developer ID"
-
-# If overrides exist, export the cert and remove them
-security find-certificate -c "Developer ID Application" -p ~/Library/Keychains/login.keychain-db > /tmp/devid-cert.pem
-security remove-trusted-cert /tmp/devid-cert.pem
 ```
 
-### Verify Certificate Chain
-
-After fixing trust settings, verify the chain is intact:
-
-```bash
-codesign --deep --force --options runtime --sign "Developer ID Application: YOUR NAME (TEAM_ID)" /path/to/any.app 2>&1
-```
-
-The signing must show the chain: Developer ID Application → Developer ID Certification Authority → Apple Root CA.
+These errors do not by themselves prove a trust override is the cause. Inspect the affected certificate before proposing a repair. Changing trust settings requires explicit authorization for that certificate; do not remove trust overrides or re-sign an arbitrary app as a diagnostic step.
 
 ## Step 1: Archive
 
@@ -88,13 +76,21 @@ This produces a `.app` bundle signed with Developer ID Application and a secure 
 
 ### Verify the Export
 
+Verify the exported app's existing signature and nested code, then display its signing details:
+
 ```bash
-codesign -dvvv "/tmp/YourAppExport/YourApp.app" 2>&1 | grep -E "Authority|Timestamp"
+codesign --verify --deep --strict --verbose=2 "/tmp/YourAppExport/YourApp.app" && \
+  codesign --display --verbose=4 "/tmp/YourAppExport/YourApp.app" 2>&1
 ```
 
 Confirm:
-- Authority chain starts with "Developer ID Application"
+- The verification command exits successfully; displaying signing details alone does not validate the signature
+- The Authority chain is Developer ID Application → Developer ID Certification Authority → Apple Root CA, with the expected TeamIdentifier
 - A Timestamp is present
+
+Stop before packaging or uploading if verification fails or the signing identity is unexpected. Diagnose the failure and rebuild or re-export the intended app before checking again. These checks do not modify the bundle and do not establish notarization acceptance.
+
+Do not add `--sign` or `--force` to verification. [Apple's code-signing guidance](https://developer.apple.com/library/archive/technotes/tn2206/) distinguishes recursive verification with `--deep` from signing with `--deep --force`, which forcibly re-signs nested code.
 
 ## Step 3: Create a ZIP for Notarization
 
@@ -182,7 +178,7 @@ asc notarization submit --file signed.pkg --wait
 ## Troubleshooting
 
 ### "Invalid trust settings" during export
-The Developer ID certificate has custom trust overrides. See the Preflight section above to remove them.
+Custom trust overrides are one possible cause. Use the read-only inspection in Preflight, identify the affected certificate, and obtain authorization before changing its trust settings.
 
 ### "The binary is not signed with a valid Developer ID certificate"
 The app was signed with a Development or App Store certificate. Re-export with `method: developer-id` in ExportOptions.plist.
