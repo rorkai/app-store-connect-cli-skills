@@ -60,6 +60,15 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
   - The command saves the one-time P8 as `AuthKey_<KEY_ID>.p8` without printing its contents; choose an explicit private directory with `--output-dir`.
   - Example: `asc web api-keys create --name "CI uploads" --role APP_MANAGER --output-dir "./keys" --output json`.
 
+## Reuse authentication before requesting another code
+- API-key authentication (`asc auth`) and Apple Account web sessions (`asc web auth`) are separate. Prefer the existing keychain API profile for supported operations; inspect `asc auth status` and command capabilities before starting a web login. A profile name is a local label, not an app-level permission boundary.
+- For web-only work, check `asc web auth status --apple-id "user@example.com" --output json` first. Reuse an authenticated cached session and verify its provider matches the intended account before mutations. Do not log out or clear trust/session state as routine preparation.
+- Give one process ownership of an interactive sign-in for an Apple Account. While a code prompt is pending, continue that same process; coordinate or serialize other agents instead of starting another login that may invalidate its challenge.
+- Match a code to the current prompt. A trusted-device notification code and an SMS fallback code belong to different verification steps. Once the CLI announces phone delivery, use the newly delivered phone code, not the earlier notification code. Do not deliberately submit bad codes as a normal resend strategy; inspect the installed command's help for supported recovery.
+- On failure, distinguish code rejection from a timeout after verification or provider selection. Inspect the exact error and installed version before requesting more codes. Increasing a request timeout is not proof that an interactive-session problem is fixed.
+- After login, verify `authenticated` and the selected provider with a separate status read; confirm the next web operation reuses the cache before reporting success. Apple may expire sessions later, so do not promise permanent unattended authentication.
+- Inspect `asc web auth login --help` before configuring a supported `--two-factor-code-command`. Keep credentials and codes out of logs, source, shell history, and PRs. Do not assume a password-manager passkey can be supplied to the CLI or that browser sign-in refreshes its cache; use only authentication mechanisms explicitly supported by the installed CLI.
+
 ## Apple Ads
 - Use `asc ads --help` before choosing a command.
 - Apple Ads uses `asc ads auth`, `--ads-profile`, and `ASC_ADS_*` variables. It does not use App Store Connect API credentials.
