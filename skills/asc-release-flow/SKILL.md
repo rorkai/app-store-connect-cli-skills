@@ -71,7 +71,7 @@ Preview metadata-driven staging:
 asc release stage \
   --app "APP_ID" \
   --version "1.2.3" \
-  --build "BUILD_ID" \
+  --build-id "BUILD_ID" \
   --metadata-dir "./metadata/version/1.2.3" \
   --dry-run \
   --output table
@@ -83,7 +83,7 @@ Apply the reviewed plan:
 asc release stage \
   --app "APP_ID" \
   --version "1.2.3" \
-  --build "BUILD_ID" \
+  --build-id "BUILD_ID" \
   --metadata-dir "./metadata/version/1.2.3" \
   --confirm
 ```
@@ -101,11 +101,11 @@ Structured output includes a `validate_build` step at the start of `steps[]`. Ma
 Use `asc review submit` after metadata, review details, availability, build processing, and product readiness are already resolved.
 
 ```bash
-asc review submit --app "APP_ID" --version "1.2.3" --build "BUILD_ID" --dry-run --output table
-asc review submit --app "APP_ID" --version "1.2.3" --build "BUILD_ID" --confirm
+asc review submit --app "APP_ID" --version "1.2.3" --build-id "BUILD_ID" --dry-run --output table
+asc review submit --app "APP_ID" --version "1.2.3" --build-id "BUILD_ID" --confirm
 ```
 
-Use `--version-id "VERSION_ID"` instead of `--version` when the exact version ID is known. `--build` may be omitted only when the intended build is already attached and verified.
+Use `--version-id "VERSION_ID"` instead of `--version` when the exact version ID is known. `--build-id` may be omitted only when the intended build is already attached and verified.
 
 ## Upload or build, then publish
 
