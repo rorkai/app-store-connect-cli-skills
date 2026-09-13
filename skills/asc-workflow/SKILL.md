@@ -187,12 +187,12 @@ Add `"if": "VAR_NAME"` to a step. Truthy values are `1`, `true`, `yes`, `y`, and
         },
         {
           "name": "stage",
-          "run": "asc release stage --app $APP_ID --version $VERSION --build $BUILD_ID --metadata-dir ./metadata/version/$VERSION --confirm --output json"
+          "run": "asc release stage --app $APP_ID --version $VERSION --build-id $BUILD_ID --metadata-dir ./metadata/version/$VERSION --confirm --output json"
         },
         {
           "name": "submit",
           "if": "SUBMIT_FOR_REVIEW",
-          "run": "asc review submit --app $APP_ID --version $VERSION --build $BUILD_ID --confirm --output json"
+          "run": "asc review submit --app $APP_ID --version $VERSION --build-id $BUILD_ID --confirm --output json"
         }
       ]
     },

@@ -105,8 +105,8 @@ Notes:
   matching App Store Connect certificate. A multi-identity PKCS#12 also needs
   `--identity-sha256`.
 - Prefer `--password-file`; `ASC_SIGNING_SYNC_PASSWORD` is the non-file fallback.
-  `--password` and `ASC_MATCH_PASSWORD` are deprecated during 4.x and will be
-  rejected in 5.0.0.
+  `--password` and `ASC_MATCH_PASSWORD` were removed in 5.0.0 and are
+  rejected.
 - Certificate/profile-only sync remains supported but reports
   `identityPresent: false`; it is not a usable signing identity by itself.
 - `pull` reports private identities in `sensitiveFiles` and writes them mode

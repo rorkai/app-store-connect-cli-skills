@@ -58,7 +58,7 @@ asc web review subscriptions attach \
 
 These commands require an authenticated Apple web session. If the user declines web-session automation, select the subscription manually in App Store Connect.
 
-Do not build new workflows around deprecated `asc subscriptions review submit`.
+Do not build workflows around `asc subscriptions review submit`; it was removed in 5.0.0.
 
 ## Prepare a subscription version
 
@@ -200,7 +200,7 @@ Upload a missing legacy review screenshot when diagnostics request one:
 asc iap review-screenshots create --iap-id "IAP_ID" --file "./review.png"
 ```
 
-Do not build new workflows around deprecated `asc iap submit`.
+Do not build workflows around `asc iap submit`; it was removed in 5.0.0.
 
 Resolve a version-scoped IAP:
 
