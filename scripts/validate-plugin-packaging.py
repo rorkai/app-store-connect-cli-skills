@@ -59,8 +59,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--expected-skills",
         type=int,
-        default=25,
-        help="Expected number of packaged skills (default: 25)",
+        default=26,
+        help="Expected number of packaged skills (default: 26)",
     )
     return parser.parse_args()
 

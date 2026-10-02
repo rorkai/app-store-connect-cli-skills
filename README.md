@@ -410,6 +410,22 @@ Triage TestFlight crashes, beta feedback, and performance diagnostics.
 Show me the latest TestFlight crashes and feedback for MyApp, grouped by signature and affected build.
 ```
 
+### asc-in-app-events
+
+Create, localize, illustrate, and submit App Store in-app events, with checks for the review and media pitfalls.
+
+**Use when:**
+- You want to publish an in-app event from the terminal
+- You need to upload event card and event details page art
+- An event cannot be added to a review submission (missing deep link)
+- You want to know where the App Store covers your event art
+
+**Example:**
+
+```bash
+Create a CHALLENGE in-app event for MyApp for June, localize it for en-US and de-DE, upload the card and details art, and submit it for review.
+```
+
 ### asc-wall-submit
 
 Submit or update an app entry in the App-Store-Connect-CLI Wall of Apps using `asc apps wall submit`.
