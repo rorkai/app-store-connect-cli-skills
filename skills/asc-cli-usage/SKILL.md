@@ -42,11 +42,14 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 - Prefer explicit flags in automation; some newer commands can prompt for missing fields when run interactively.
 - Destructive operations require `--confirm`.
 - Use `--paginate` when the user wants all pages.
+- Put command-specific flags after the leaf subcommand; parent command groups reject misplaced flags.
+- Treat `--next` URLs as opaque continuations. Do not combine them with new filters, sorting, or page-size flags; follow the selected command's help for required selectors.
 
 ## Output formats
 - Output defaults are TTY-aware: `table` in interactive terminals, `json` when piped or non-interactive.
 - Use `--output table` or `--output markdown` only for human-readable output.
 - `--pretty` is only valid with JSON output.
+- Check the exit status as well as stdout. Failed batch operations can emit partial receipts; inspect completed actions and resource IDs before retrying mutations.
 
 ## Authentication and defaults
 - Prefer keychain auth via `asc auth login`.
@@ -69,6 +72,8 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 - On failure, distinguish code rejection from a timeout after verification or provider selection. Inspect the exact error and installed version before requesting more codes. Increasing a request timeout is not proof that an interactive-session problem is fixed.
 - After login, verify `authenticated` and the selected provider with a separate status read; confirm the next web operation reuses the cache before reporting success. Apple may expire sessions later, so do not promise permanent unattended authentication.
 - Inspect `asc web auth login --help` before configuring a supported `--two-factor-code-command`. Keep credentials and codes out of logs, source, shell history, and PRs. Do not assume a password-manager passkey can be supplied to the CLI or that browser sign-in refreshes its cache; use only authentication mechanisms explicitly supported by the installed CLI.
+- A fresh non-interactive web sign-in requires `--two-factor-code-command` or `ASC_WEB_2FA_CODE_COMMAND`; without one it fails before sending the password. Cached-session reuse does not require a fresh sign-in.
+- Select a public team ID with `--public-provider-id`; `--provider-id` takes Apple's numeric provider ID. Do not substitute an API profile name for either ID.
 
 ## Apple Ads
 - Use `asc ads --help` before choosing a command.
