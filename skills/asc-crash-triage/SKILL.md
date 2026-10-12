@@ -10,7 +10,7 @@ Use this skill to fetch, analyze, and summarize TestFlight crash reports, beta f
 ## Workflow
 
 1. Resolve the app ID if not provided (use `asc apps list`).
-2. Fetch data with the appropriate command.
+2. Fetch data with the appropriate command, using `--output json` for responses that will be parsed. For `performance download`, `--output` is the destination file path.
 3. Parse JSON output and present a human-readable summary.
 
 ## TestFlight crash reports
@@ -63,7 +63,7 @@ For performance diagnostics, highlight the highest-weight signatures first.
 
 ## Notes
 
-- Default output is JSON; use `--output table` or `--output markdown` for quick human review.
+- Read-command output defaults to table in a terminal and JSON in pipes or CI. Select the format explicitly when parsing results.
 - Use `--paginate` to fetch all pages when doing a full analysis.
 - Use `--pretty` with JSON for debugging command output.
 - Crash data from App Store Connect may have 24-48h delay.

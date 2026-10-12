@@ -1,6 +1,6 @@
 # Multi-item review submissions
 
-Read this reference when one review submission must contain the app version plus versioned digital goods, Game Center components, or both.
+Read this reference when one review submission must contain the app version plus versioned digital goods, Game Center components, in-app events, or Asset Library media.
 
 Follow only the section for the current phase:
 
@@ -12,7 +12,8 @@ Follow only the section for the current phase:
 
 - Resolve the exact `VERSION_ID` and each product or component version ID.
 - Use `asc-submission-health` to repair missing IAP, subscription, or subscription-group versions.
-- Confirm the Game Center app version exists:
+- Use `asc-in-app-events` for event readiness and `asc-metadata-sync` for Asset Library delivery and placement checks. Event and library asset IDs are distinct from their localization or placement IDs.
+- For releases with Game Center items, confirm the Game Center app version exists:
 
 ```bash
 asc game-center app-versions list --app "APP_ID" --output table
@@ -74,6 +75,11 @@ Supported Game Center item types also include:
 - `gameCenterLeaderboardSetVersions`
 
 Add only types required for this release. Do not submit placeholder or unresolved IDs.
+
+For authorized event or library co-submissions, use `appEvents`,
+`appAssetLibraryImages`, or `appAssetLibraryVideos` with the resolved resource ID.
+Inspect existing item relationships first, as above. These types do not require a
+Game Center app version; run Game Center preparation only when that release uses it.
 
 ## Submit
 

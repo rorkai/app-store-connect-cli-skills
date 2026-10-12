@@ -78,6 +78,11 @@ the localization is already resolved. Video uploads use
 `asc app-events video-clips create`; inspect its help for asset types and
 `--preview-frame-time-code`.
 
+To reuse existing Asset Library media, use `asc app-events localizations placements`
+with the event localization ID and `EVENT_CARD_ASSET` or `EVENT_DETAILS_PAGE_ASSET`.
+Follow the [Asset Library workflow](../asc-metadata-sync/references/asset-library.md)
+for upload, delivery, and placement checks; a placement does not submit the event.
+
 Use JPG/JPEG/PNG images, at most 500 MB each. Export opaque images without
 alpha channels for upload compatibility. Apple specifies these dimensions:
 

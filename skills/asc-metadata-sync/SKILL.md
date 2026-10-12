@@ -1,6 +1,6 @@
 ---
 name: asc-metadata-sync
-description: Sync, validate, and apply App Store metadata with the current asc canonical metadata workflow. Use when updating metadata, localizations, keywords, or migrating legacy fastlane metadata.
+description: Sync, validate, and apply App Store metadata and store assets with asc. Use when updating localizations, keywords, App Clip or preview assets, Asset Library media and placements, or migrating legacy fastlane metadata.
 ---
 
 # asc metadata sync
@@ -79,6 +79,28 @@ asc metadata apply --app "APP_ID" --version "1.2.3" --platform IOS --dir "./meta
 
 Use `asc metadata approve --key "version:1.2.3:en-US:whatsNew"` or `--scope app-info,version` when the user wants selective approval artifacts before the guarded apply. Version-scoped keys include the App Store version string.
 
+## App Clip and preview transfers
+
+Metadata pull/push defaults to localization text. Select asset scopes explicitly:
+
+```bash
+asc metadata pull --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata" --include localizations,app-clip,previews
+asc metadata push --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata" --include localizations,app-clip,previews --dry-run
+asc metadata push --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata" --include localizations,app-clip,previews --confirm
+```
+
+Preview validation requires `ffprobe`. App Clip header replacement deletes the old
+header first and also requires `--allow-deletes`; authorize that replacement explicitly.
+Exports may contain HLS `.m3u8` playlists and `.preview.json` references, not original
+videos. Matching remote previews can be reused; an unmatched reference needs the
+original video or exclusion of `previews` from `--include`. Renaming a playlist to
+`.mp4` does not make it uploadable. Direct `video-previews download` also returns
+playlists; use a `.m3u8` output path for individual downloads.
+
+For reusable library media, headers/search creative assets, or localized placements,
+read [Asset Library workflows](references/asset-library.md). These are separate from
+App Clip header images and ordinary metadata text.
+
 ## Keyword-only workflow
 
 Use this when only the version-localization `keywords` field should change:
@@ -148,6 +170,11 @@ asc migrate import --app "APP_ID" --version-id "VERSION_ID" --fastlane-dir "./fa
 Deliverfile `metadata_path` and `screenshots_path` values take precedence and resolve relative to the Deliverfile. With `--fastlane-dir "./fastlane"`, use `metadata_path "./metadata"` rather than `"./fastlane/metadata"`; the latter resolves to `./fastlane/fastlane/metadata`. Fix stale values in the Deliverfile, or remove them to use the conventional `metadata/` and `screenshots/` directories.
 
 Paths outside the selected Fastlane directory fail unless the operator explicitly trusts them with `--allow-external-metadata` or `--allow-external-screenshots`. Keep those flags off for untrusted imports.
+
+An import `--dry-run` inventories local inputs by default. Add `--check-remote` to
+compare remote store assets without writes; this requires auth and may download
+delivered media. Use `--skip-previews` when exported playlist references cannot be
+matched and the original videos are unavailable.
 
 Inspect the validation body as well as the process exit: `asc migrate validate` can return a report with `valid: false` and a nonzero `errorCount` while exiting 0. A confirmed import can print `status: "partial"` with completed stages and failure details while exiting nonzero, so non-empty stdout does not mean success.
 
