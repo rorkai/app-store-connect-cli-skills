@@ -18,17 +18,20 @@ Inspect existing media before uploading a duplicate. List commands support
 category, state, specification, reference-name, and ID filters; check leaf help.
 Upload defaults to `CREATIVE_ASSETS` for headers, search, and event media. Select
 `APP_SCREENSHOTS_AND_PREVIEWS` for in-use screenshots and app previews.
+Use `--reference-name` on either upload command to assign an internal name during
+creation; when omitted, Apple's default name is derived from the file name.
 
 ```bash
-asc asset-library images upload --library-id "LIBRARY_ID" --file "./header.png" --output json
-asc asset-library videos upload --library-id "LIBRARY_ID" --file "./preview.mp4" --category APP_SCREENSHOTS_AND_PREVIEWS --output json
+asc asset-library images upload --library-id "LIBRARY_ID" --file "./header.png" --reference-name "Hero en-US 3.14" --output json
+asc asset-library videos upload --library-id "LIBRARY_ID" --file "./preview.mp4" --category APP_SCREENSHOTS_AND_PREVIEWS --reference-name "Preview en-US 3.14" --output json
 ```
 
 Use current specifications for the selected category; images cannot contain an
-alpha channel, and videos require `ffprobe`. Save the asset ID, including from
-partial failure receipts. Inspect `images view --id` or `videos view --id` before
-retrying a timeout: processing may still continue. A processed upload is not
-App Review approval.
+alpha channel, and videos require `ffprobe`. Video uploads use
+`ASC_UPLOAD_TIMEOUT` (default `30m`) because Apple commonly takes 10 to 15 minutes
+to process a video. Save the asset ID, including from partial failure receipts.
+Inspect `images view --id` or `videos view --id` before retrying a timeout:
+processing may still continue. A processed upload is not App Review approval.
 
 ## Assign media to a localization
 
