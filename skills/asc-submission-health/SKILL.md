@@ -52,7 +52,8 @@ Collect direct evidence when the report points at the build or version:
 
 ```bash
 asc builds info --build-id "BUILD_ID" --output table
-asc versions view --version-id "VERSION_ID" --include-build --include-submission --output table
+# The attached build and submission are in .data.relationships and .included
+asc versions view --version-id "VERSION_ID" --include build,appStoreVersionSubmission --output json
 ```
 
 For digital goods, run only the relevant product validator:
