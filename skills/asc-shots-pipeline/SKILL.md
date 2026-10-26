@@ -179,7 +179,7 @@ asc screenshots sizes --output table
 asc screenshots list --version-localization "LOC_ID" --output table
 ```
 
-Change the order of an uploaded set without re-uploading. `--ids` must list every screenshot in the set exactly once, in the new order. If a screenshot is added or removed after the read, App Store Connect rejects the update and keeps the old order; list the set again and re-run. An order-only change made by someone else is not detected and is overwritten.
+Change the order of an uploaded set without re-uploading. `--ids` must list every screenshot in the set exactly once, in the new order. If a screenshot is added after the command reads the set, App Store Connect rejects the update and keeps the order it had before the update; list the set again and re-run. An order-only change made by someone else is not detected and is overwritten.
 
 ```bash
 asc localizations screenshot-sets list --localization-id "LOC_ID" --include appScreenshots
