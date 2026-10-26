@@ -23,10 +23,21 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
   - `asc capabilities --status web-session --output table`
   - `asc capabilities --status not-public-api --output markdown`
 
+## Prefer native commands over `asc api`
+- Use a native command for every read and write. Find it with `asc search "TASK"` or `--help` before reaching for `asc api`.
+- For native reads that support `--include`, use it to fetch related records in one call instead of one request per relationship. Use `--output json` to inspect related resources in the `included` array.
+  - `asc versions view --version-id "VERSION_ID" --include build,appStoreVersionSubmission`
+  - `asc builds info --build-id "BUILD_ID" --include buildBetaDetail,betaAppReviewSubmission,betaGroups`
+  - `asc iap view --id "IAP_ID" --include inAppPurchaseLocalizations,appStoreReviewScreenshot`
+  - `asc review submissions-get --id "SUBMISSION_ID" --include items,appStoreVersionForReview`
+- Single-resource and child-list reads have their own commands, such as `asc localizations view --id "LOCALIZATION_ID"`, `asc testflight groups builds list --group-id "GROUP_ID"`, and `asc pricing availability territory-availabilities --app "APP_ID"`.
+- Use `asc api <METHOD> <PATH>` only when no native command covers the task. Its writes require `--confirm`. Do not hand-write `curl` requests with `asc auth token`.
+
 ## Canonical verbs (current asc)
 - Prefer `view` over legacy `get` aliases for read-only commands in docs and automation.
   - `asc apps view --id "APP_ID"`
-  - `asc versions view --version-id "VERSION_ID"`
+  - `asc versions view --version-id "VERSION_ID" --include build`
+  - Without `--include`, `asc versions view` prints a deprecated summary; JSON output also warns on stderr. Use `--include build` instead of `--include-build` and `--include appStoreVersionSubmission` instead of `--include-submission`.
   - `asc pricing availability view --app "APP_ID"`
 - Prefer `edit` for update-only availability surfaces and other canonical edit flows.
   - `asc pricing availability edit --app "APP_ID" --territory "USA,GBR" --available true`

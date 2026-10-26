@@ -179,12 +179,21 @@ asc screenshots sizes --output table
 asc screenshots list --version-localization "LOC_ID" --output table
 ```
 
+Change the order of an uploaded set without re-uploading. `--ids` must list every screenshot in the set exactly once, in the new order. If a screenshot is added after the command reads the set, App Store Connect rejects the update and keeps the order it had before the update; list the set again and re-run. An order-only change made by someone else is not detected and is overwritten.
+
+```bash
+asc localizations screenshot-sets list --localization-id "LOC_ID" --include appScreenshots
+asc screenshots list --set-id "SET_ID" --output table
+asc screenshots reorder --set-id "SET_ID" --ids "THIRD_ID,FIRST_ID,SECOND_ID"
+```
+
 ## Agent behavior
 - Always confirm exact flags with `--help` before running commands.
 - Re-check command paths with `asc screenshots --help` because screenshot commands are evolving quickly.
 - Keep outputs deterministic: default to JSON for machine steps.
 - Prefer `asc screenshots list-frame-devices --output json` before selecting a frame device.
 - Ensure screenshot files exist before upload.
+- Reorder an uploaded set with `asc screenshots reorder`; never delete and re-upload screenshots to change their order.
 - Use explicit long flags (`--app`, `--output`, `--version-localization`, etc.).
 - Treat screenshot-local automation as experimental and call it out in user-facing handoff notes.
 - Use `asc screenshots plan` / `asc screenshots apply` for reviewed batches when you need append-limit guardrails across existing remote screenshots.

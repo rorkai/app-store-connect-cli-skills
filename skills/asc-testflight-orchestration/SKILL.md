@@ -16,6 +16,7 @@ Use this skill when managing TestFlight testers, groups, and build distribution.
 - Groups:
   - `asc testflight groups list --app "APP_ID" --paginate`
   - `asc testflight groups create --app "APP_ID" --name "Beta Testers"`
+  - A group's builds and testers: `asc testflight groups builds list --group-id "GROUP_ID" --paginate` and `asc testflight groups testers list --group-id "GROUP_ID" --paginate`
 - Testers:
   - `asc testflight testers list --app "APP_ID" --paginate`
   - `asc testflight testers add --app "APP_ID" --email "tester@example.com" --group "Beta Testers"`
