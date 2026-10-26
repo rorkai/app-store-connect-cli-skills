@@ -83,8 +83,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          claude plugin validate .claude-plugin/plugin.json --strict
-          claude plugin validate .claude-plugin/marketplace.json --strict
+          python scripts/validate-claude-plugin.py
           asc_claude_config_dir="${RUNNER_TEMP}/asc-claude-config"
           mkdir -p "${asc_claude_config_dir}"
           CLAUDE_CONFIG_DIR="${asc_claude_config_dir}" claude plugin marketplace add ./

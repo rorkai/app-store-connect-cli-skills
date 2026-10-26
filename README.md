@@ -29,6 +29,15 @@ claude plugin marketplace add rorkai/app-store-connect-cli-skills
 claude plugin install asc@rorkai
 ```
 
+The Claude plugin follows Git commits. Keep `version` out of both Claude
+manifests so skill updates do not require a manual version bump. To refresh an
+existing install, run these commands, then restart Claude Code:
+
+```bash
+claude plugin marketplace update rorkai
+claude plugin update asc@rorkai
+```
+
 ### Codex plugin
 
 The repository includes a Codex plugin manifest and can be listed by a Codex plugin marketplace.

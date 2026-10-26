@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "asc",
   "displayName": "App Store Connect CLI Skills",
-  "version": "1.0.0",
   "description": "Production workflows for shipping apps with the unofficial App Store Connect CLI, including builds, TestFlight, metadata, submissions, signing, screenshots, and Apple Ads.",
   "author": {
     "name": "Rudrank Riyam",

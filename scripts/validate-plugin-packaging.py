@@ -111,12 +111,9 @@ def validate_https(payload: dict[str, Any], field: str, label: str, errors: list
 
 def validate_identity(payload: dict[str, Any], label: str, errors: list[str]) -> None:
     name = require_string(payload, "name", label, errors)
-    version = require_string(payload, "version", label, errors)
     require_string(payload, "description", label, errors)
     if name is not None and KEBAB_CASE.fullmatch(name) is None:
         errors.append(f"{label}.name must be lowercase kebab-case")
-    if version is not None and SEMVER.fullmatch(version) is None:
-        errors.append(f"{label}.version must be strict semver")
 
     author = payload.get("author")
     if not isinstance(author, dict):
@@ -154,6 +151,9 @@ def validate_codex(root: Path, manifest: dict[str, Any], errors: list[str]) -> N
     if unknown:
         errors.append(f"{label} contains unsupported fields: {', '.join(unknown)}")
     validate_identity(manifest, label, errors)
+    version = require_string(manifest, "version", label, errors)
+    if version is not None and SEMVER.fullmatch(version) is None:
+        errors.append(f"{label}.version must be strict semver")
     skills = validate_relative_directory(root, manifest.get("skills"), f"{label}.skills", errors)
     if skills is not None and skills != (root / "skills").resolve():
         errors.append(f"{label}.skills must resolve to the root skills directory")
@@ -187,6 +187,8 @@ def validate_claude(
 ) -> None:
     label = ".claude-plugin/plugin.json"
     validate_identity(manifest, label, errors)
+    if "version" in manifest:
+        errors.append(f"{label} must omit version so Claude updates follow Git commits")
     if manifest.get("$schema") != "https://json.schemastore.org/claude-code-plugin-manifest.json":
         errors.append(f"{label} must reference the official Claude Code plugin schema")
     plugin_name = manifest.get("name")
@@ -199,6 +201,8 @@ def validate_claude(
         errors.append("Claude marketplace must contain exactly one entry matching the plugin name")
     elif matches[0].get("source") != "./":
         errors.append("Claude marketplace plugin source must be `./` so the repository root is loadable")
+    if len(matches) == 1 and "version" in matches[0]:
+        errors.append("Claude marketplace entry must omit version so Claude updates follow Git commits")
 
 
 def validate_skills(root: Path, expected: int, errors: list[str]) -> list[Path]:
@@ -227,13 +231,14 @@ def validate(root: Path, expected_skills: int) -> list[str]:
     if claude is not None and marketplace is not None:
         validate_claude(root, claude, marketplace, errors)
     if codex is not None and claude is not None:
-        for field in ("name", "version", "repository", "homepage", "license"):
+        for field in ("name", "repository", "homepage", "license"):
             if codex.get(field) != claude.get(field):
                 errors.append(f"Codex and Claude manifests must use the same {field}")
     if not errors and len(skill_dirs) == expected_skills:
         print(
             f"Packaging validation passed: {len(skill_dirs)} skills, "
-            f"Codex {codex.get('name')}, Claude {claude.get('name')}, version {codex.get('version')}"
+            f"Codex {codex.get('name')} version {codex.get('version')}, "
+            f"Claude {claude.get('name')} (Git commit version)"
         )
     return errors
 
