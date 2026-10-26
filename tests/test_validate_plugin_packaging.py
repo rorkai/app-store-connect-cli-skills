@@ -43,7 +43,6 @@ class PackagingValidatorTests(unittest.TestCase):
         self.claude = {
             "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
             "name": "asc",
-            "version": "1.0.0",
             "description": "Example Claude package",
             "author": {"name": "Example", "url": "https://example.com"},
             "homepage": "https://example.com/plugin",
@@ -69,13 +68,19 @@ class PackagingValidatorTests(unittest.TestCase):
     def test_valid_cross_host_package(self) -> None:
         self.assertEqual([], VALIDATOR.validate(self.root, 1))
 
-    def test_rejects_cross_host_version_drift(self) -> None:
-        self.claude["version"] = "1.1.0"
-        self.write_manifests()
-        self.assertIn(
-            "Codex and Claude manifests must use the same version",
-            VALIDATOR.validate(self.root, 1),
-        )
+    def test_rejects_claude_version_pins(self) -> None:
+        for label, payload in (
+            (".claude-plugin/plugin.json", self.claude),
+            ("Claude marketplace entry", self.marketplace["plugins"][0]),
+        ):
+            with self.subTest(label=label):
+                payload["version"] = "1.0.0"
+                self.write_manifests()
+                self.assertIn(
+                    f"{label} must omit version so Claude updates follow Git commits",
+                    VALIDATOR.validate(self.root, 1),
+                )
+                del payload["version"]
 
     def test_rejects_cross_host_name_drift(self) -> None:
         self.codex["name"] = "asc-codex"
