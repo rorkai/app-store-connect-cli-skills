@@ -369,9 +369,9 @@ asc iap pricing schedules manual-prices --schedule-id "SCHEDULE_ID" --paginate
 asc iap pricing schedules automatic-prices --schedule-id "SCHEDULE_ID" --paginate
 ```
 
-For future-dated schedules, verify the scheduled records and dates in the raw
-paginated reads. The resolved current-price snapshot stays unchanged until the
-new prices take effect.
+For future-dated schedules, run `summary` for every changed territory to verify
+scheduled price-point IDs and dates; keep the raw paginated reads for the full
+schedule inventory. The resolved snapshot excludes prices until they take effect.
 
 ## Common PPP strategy patterns
 
