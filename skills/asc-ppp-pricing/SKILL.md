@@ -106,8 +106,8 @@ asc subscriptions pricing prices list --subscription-id "SUB_ID" --resolved
 
 Use `summary` for quick before/after spot checks. `prices list --resolved`
 returns the current effective price for every territory (customer price,
-currency, proceeds, price point ID), which is the full before/after snapshot.
-Plain `prices list --paginate` returns raw price records without those values.
+currency, proceeds, price point ID). It excludes future-dated prices; use
+`prices list --paginate` for raw records when checking scheduled changes.
 
 ### Derive one subscription's localized prices from another
 Use `derive` when a target subscription should stay near a fixed multiple of a
@@ -239,6 +239,7 @@ Re-run the summary and raw list views after changes.
 asc subscriptions pricing summary --subscription-id "SUB_ID" --territory "IND"
 asc subscriptions pricing summary --subscription-id "SUB_ID" --territory "BRA"
 asc subscriptions pricing prices list --subscription-id "SUB_ID" --resolved
+asc subscriptions pricing prices list --subscription-id "SUB_ID" --paginate
 ```
 
 After the version metadata exists, you may rerun `asc subscriptions setup` with
@@ -318,8 +319,10 @@ asc iap pricing schedules manual-prices --schedule-id "SCHEDULE_ID" --resolved -
 
 `--resolved` returns one row per territory with territory, customer price,
 currency, proceeds, price point ID, and whether the price is manual.
-`automatic-prices` accepts `--resolved` too. Without `--resolved`, both commands
-return bare price IDs only.
+Both `manual-prices --resolved` and `automatic-prices --resolved` combine manual
+and automatic prices active today. They exclude future-dated entries. Without
+`--resolved`, these commands return raw schedule records; use `--paginate` to
+include every page when checking scheduled changes.
 
 ### Discover candidate IAP price points
 Look up one territory's ladder with `price-points list`, one territory per call.
@@ -351,8 +354,8 @@ Use these when you are intentionally creating or replacing schedule entries. For
 
 ```bash
 asc iap pricing schedules view --iap-id "IAP_ID"
-asc iap pricing schedules manual-prices --schedule-id "SCHEDULE_ID" --resolved
-asc iap pricing schedules automatic-prices --schedule-id "SCHEDULE_ID" --resolved
+asc iap pricing schedules manual-prices --schedule-id "SCHEDULE_ID" --paginate
+asc iap pricing schedules automatic-prices --schedule-id "SCHEDULE_ID" --paginate
 ```
 
 ### Verify after apply
@@ -362,9 +365,13 @@ Use the summary command again after scheduling or applying pricing changes.
 asc iap pricing summary --iap-id "IAP_ID" --territory "USA"
 asc iap pricing summary --iap-id "IAP_ID" --territory "IND"
 asc iap pricing schedules manual-prices --schedule-id "SCHEDULE_ID" --resolved --output table
+asc iap pricing schedules manual-prices --schedule-id "SCHEDULE_ID" --paginate
+asc iap pricing schedules automatic-prices --schedule-id "SCHEDULE_ID" --paginate
 ```
 
-For future-dated schedules, expect scheduled changes rather than an immediately updated current price.
+For future-dated schedules, verify the scheduled records and dates in the raw
+paginated reads. The resolved current-price snapshot stays unchanged until the
+new prices take effect.
 
 ## Common PPP strategy patterns
 
@@ -391,5 +398,5 @@ For future-dated schedules, expect scheduled changes rather than an immediately 
 - Prefer canonical IAP commands in docs and automation: `asc iap pricing ...`
 - `asc subscriptions pricing prices import --dry-run` is the safest subscription batch PPP path today.
 - `asc subscriptions setup` and `asc iap setup` already provide built-in post-create verification.
-- There is not yet a single first-class before/after PPP diff command; save the `--resolved` reads before and after apply and compare them.
+- There is not yet a single first-class before/after PPP diff command; compare `--resolved` reads for current prices and raw paginated records for scheduled changes.
 - Price changes may take time to propagate in App Store Connect and storefronts.
