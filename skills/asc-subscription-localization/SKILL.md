@@ -7,9 +7,7 @@ description: Bulk-localize subscription, subscription-group, and in-app purchase
 
 Use this skill to bulk-create or bulk-update display names and, where supported,
 descriptions for subscriptions, subscription groups, and in-app purchases across
-all App Store Connect locales. This eliminates the tedious manual process of
-clicking through each language in App Store Connect to set the same display
-name.
+all App Store Connect locales.
 
 ## Preconditions
 - Auth configured (`asc auth login` or `ASC_*` env vars).
@@ -48,11 +46,9 @@ asc subscriptions versions create --subscription-id "SUB_ID" --output json
 asc subscriptions groups versions create --group-id "GROUP_ID" --output json
 ```
 
-None of the three version families has a version delete command. List and
-reuse the single `PREPARE_FOR_SUBMISSION` version; create only for zero matches,
-and stop for an explicit ID when multiple matches exist. Live parent deletion
-did not cascade IAP or subscription versions, so do not assume parent deletion
-cleans up versions created for testing.
+None of the three version families has a version delete command. Live parent
+deletion did not cascade IAP or subscription versions, so do not assume parent
+deletion cleans up versions created for testing.
 
 ## Supported App Store Locales
 
@@ -103,11 +99,6 @@ live service currently rejects both an empty `--description` and
 `--clear-description` for subscription-version localizations because the
 description must contain at least one character.
 
-Creating a missing subscription-version localization therefore requires a
-non-empty description. A display-name-only run may update the name of an
-existing localization, but must not create a missing locale until the user
-provides a non-empty locale-specific or shared fallback description.
-
 ## Workflow: Bulk-localize a subscription group version (v2)
 
 ```bash
@@ -139,9 +130,7 @@ asc iap versions localizations list --version-id "VERSION_ID" --paginate --outpu
 
 Apple's live service also rejects empty descriptions and
 `--clear-description` for IAP-version localizations even though the 4.4.1
-schema permits JSON `null`. As with subscriptions, a display-name-only run may
-update existing IAP localizations but must not create missing locales until a
-non-empty description is available.
+schema permits JSON `null`.
 
 ## Bulk-localize all subscription versions in an app
 
@@ -200,8 +189,6 @@ matches are returned.
 
 ## Notes
 - Subscription display names are what users see on the subscription management sheet and in purchase dialogs.
-- Creating a localization for a locale that already exists will fail; list
-  first and update the resolved ID when a change is needed.
 - Apple has no bulk localization endpoint; `... localizations import` validates the whole file, then writes one locale at a time.
 - Use `--paginate` on list commands to ensure all existing localizations are returned.
 - Use the `asc-id-resolver` skill if you only have app names instead of IDs.

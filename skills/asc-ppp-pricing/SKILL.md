@@ -79,12 +79,8 @@ asc subscriptions versions localizations list --version-id "SUBSCRIPTION_VERSION
 asc validate subscriptions --app "APP_ID" --output table
 ```
 
-For each version list, reuse its single `PREPARE_FOR_SUBMISSION` result. Create
-only when the result is empty; if more than one result is returned, stop and
-require an explicit version ID instead of creating another non-deletable
-version. Each localization create/update pair is also conditional: create for
-a missing locale, update the resolved localization only when values differ,
-and do nothing when it already matches.
+Follow the conditions in the comments exactly: versions cannot be deleted, so
+never create a second `PREPARE_FOR_SUBMISSION` version.
 
 Notes:
 - `setup` materializes Apple's complete equalized price matrix from the selected
@@ -287,11 +283,6 @@ asc iap versions localizations update --localization-id "IAP_LOC_ID" --name "Pro
 # Otherwise, do nothing.
 ```
 
-Reuse the single `PREPARE_FOR_SUBMISSION` version. Create only when the list is
-empty, and stop for an explicit version ID if multiple matches are returned.
-Create the localization only when `en-US` is absent, update its resolved ID only
-when values differ, and otherwise do nothing.
-
 Notes:
 - `setup` verifies the created IAP and price schedule by default; verify the
   version localization with its version-scoped list command.
@@ -393,9 +384,7 @@ schedule inventory. The resolved snapshot excludes prices until they take effect
 - Re-run summary checks for the most important territories.
 
 ## Notes
-- Prefer canonical commands in docs and automation: `asc subscriptions pricing ...`
-- `asc subscriptions pricing ...` is the supported subscription pricing family; do not use the removed `asc subscriptions prices ...` path.
-- Prefer canonical IAP commands in docs and automation: `asc iap pricing ...`
+- Use `asc subscriptions pricing ...` and `asc iap pricing ...` in docs and automation; do not use the removed `asc subscriptions prices ...` path.
 - `asc subscriptions pricing prices import --dry-run` is the safest subscription batch PPP path today.
 - `asc subscriptions setup` and `asc iap setup` already provide built-in post-create verification.
 - There is not yet a single first-class before/after PPP diff command; compare `--resolved` reads for current prices and raw paginated records for scheduled changes.

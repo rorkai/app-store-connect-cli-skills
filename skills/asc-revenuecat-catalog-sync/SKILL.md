@@ -177,11 +177,8 @@ Each adjacent create/update pair above is conditional, not a sequence to run
 blindly: create when the list has no match, update when the resolved match has
 different values, and do nothing when it already matches. Capture `.data.id`
 from a create response or `.data[].id` from the preceding list as the canonical
-ID used by later commands. For each version list, zero
-`PREPARE_FOR_SUBMISSION` matches means create, one means reuse that ID, and more
-than one means stop and require the user to choose an explicit version ID. Do
-not create a version to resolve ambiguity: parent deletion did not reliably
-cascade IAP or subscription versions in live testing.
+ID used by later commands. Do not create a version to resolve ambiguity: parent
+deletion did not reliably cascade IAP or subscription versions in live testing.
 
 `subscriptions setup` finishes the parent, App Review screenshot delivery,
 complete App Store price matrix, and sale availability. The version-scoped
@@ -197,10 +194,10 @@ the selected base price is unchanged, re-run the same setup inputs with
 `--repair`. Repair atomically rebuilds and re-saves the complete equalized price
 matrix; it is not a duplicate single-price POST.
 
-For every resolved ASC subscription, require this final gate before creating or
-attaching its RevenueCat product. Run it after the final ASC reconciliation even
-when the subscription and its selected version were reused without any ASC
-write:
+Before creating or attaching the RevenueCat product for any resolved ASC
+subscription or IAP, run its strict gate after the final ASC reconciliation,
+even when the product and its selected version were reused without any ASC
+write. For subscriptions:
 
 ```bash
 mkdir -p "./audit"
@@ -208,9 +205,7 @@ asc validate subscriptions --app "APP_ID" --strict --output json --pretty \
   > "./audit/subscriptions-validation.json"
 ```
 
-For every resolved ASC IAP, require the IAP gate before creating or attaching
-its RevenueCat product. Run it after the final ASC reconciliation even when the
-IAP and its selected version were reused without any ASC write:
+For IAPs:
 
 ```bash
 mkdir -p "./audit"
@@ -222,11 +217,11 @@ Both commands are strict mapping gates, not post-write smoke tests. Do not map
 any resolved or reused subscription while validation reports warnings, errors,
 `MISSING_METADATA`, a review screenshot that is not `COMPLETE`, or incomplete
 or unverified pricing coverage. Do not map any resolved or reused IAP while its
-validator reports warnings or errors. A zero-write audit or apply run must still
-execute the applicable gate and require a zero exit status before RevenueCat
-product creation or attachment. Direct redirection preserves each validator's
-exit status. Retain `./audit/subscriptions-validation.json` and
-`./audit/iap-validation.json` as final audit evidence.
+validator reports warnings or errors. Require a zero exit status from the
+applicable gate before RevenueCat product creation or attachment; direct
+redirection preserves each validator's exit status. Retain
+`./audit/subscriptions-validation.json` and `./audit/iap-validation.json` as
+final audit evidence.
 
 ### Step E - Ensure RevenueCat app and products
 

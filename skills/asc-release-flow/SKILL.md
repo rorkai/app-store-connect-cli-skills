@@ -5,7 +5,7 @@ description: Orchestrate App Store releases with asc, including staging a versio
 
 # App Store release orchestration
 
-Use this skill to carry a release from an approved plan to App Store review. Keep Game Center item preparation here; keep other blocker diagnosis and review recovery in `asc-submission-health`.
+Use this skill to carry a release from an approved plan to App Store review.
 
 ## Ownership boundary
 
