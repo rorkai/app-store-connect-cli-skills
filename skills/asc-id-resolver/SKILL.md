@@ -30,7 +30,7 @@ Use this skill to map names to IDs needed by other commands.
 ## Digital-goods version IDs
 
 API 4.4.1 version IDs are distinct from IAP product, subscription, and
-subscription-group IDs:
+subscription-group IDs.
 
 Resolve the owning resources first:
 
