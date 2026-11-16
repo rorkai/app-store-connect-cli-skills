@@ -37,7 +37,7 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 - Prefer `view` over legacy `get` aliases for read-only commands in docs and automation.
   - `asc apps view --id "APP_ID"`
   - `asc versions view --version-id "VERSION_ID" --include build`
-  - Without `--include`, `asc versions view` prints a deprecated summary; JSON output also warns on stderr. Use `--include build` instead of `--include-build` and `--include appStoreVersionSubmission` instead of `--include-submission`.
+  - `asc versions view` prints Apple's full `appStoreVersions` envelope by default, including the attributes and null values returned by the API. Use `--include` to expand related resources. The `--include-build` and `--include-submission` aliases remain supported; prefer `--include build` and `--include appStoreVersionSubmission` in new examples.
   - `asc pricing availability view --app "APP_ID"`
 - Prefer `edit` for update-only availability surfaces and other canonical edit flows.
   - `asc pricing availability edit --app "APP_ID" --territory "USA,GBR" --available true`

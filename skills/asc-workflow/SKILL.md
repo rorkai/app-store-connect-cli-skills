@@ -126,6 +126,18 @@ asc workflow run beta VERSION=2.1.0
 
 Repeated keys are last-write-wins. In shell commands, reference params through shell expansion like `$VERSION`.
 
+## Environment files
+
+Pass `--env-file` to load a `KEY=VALUE` file; repeat it to load several. Files
+are opt-in, later files override earlier ones, and existing process variables
+win over file values. Workflow env, step env, and CLI params override file
+values. Values are not printed, and files are not saved with workflow run state,
+so pass them again when resuming.
+
+```bash
+asc workflow run --env-file "./release.env" --dry-run beta
+```
+
 ## Env precedence
 
 Main workflow run:
