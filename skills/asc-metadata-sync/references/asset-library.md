@@ -29,7 +29,9 @@ asc asset-library videos upload --library-id "LIBRARY_ID" --file "./preview.mp4"
 Use current specifications for the selected category; images cannot contain an
 alpha channel, and videos require `ffprobe`. Video uploads use
 `ASC_UPLOAD_TIMEOUT` (default `30m`) because Apple commonly takes 10 to 15 minutes
-to process a video. Save the asset ID, including from partial failure receipts.
+to process a video. Image uploads use the same variable with a default of
+11 minutes plus 30 seconds per MiB, capped at one hour. Save the asset ID,
+including from partial failure receipts.
 Inspect `images view --id` or `videos view --id` before retrying a timeout:
 processing may still continue. A processed upload is not App Review approval.
 
