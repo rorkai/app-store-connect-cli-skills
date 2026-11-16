@@ -1,6 +1,6 @@
 ---
 name: asc-apple-ads
-description: Use when managing Apple Ads with asc, including OAuth profiles, ad-account discovery, Platform API v1 campaigns and targeting, reports, assets, recommendations, guarded mutations, raw requests, and Campaign Management API v5 migration.
+description: Use when managing Apple Ads with asc, including OAuth profiles, ad-account discovery, Platform API v1 campaigns and targeting, reports, assets, recommendations, guarded mutations, raw requests, and migrating existing v5 scripts.
 ---
 
 # asc Apple Ads
@@ -10,15 +10,15 @@ Run Apple Ads work through `asc ads`. Apple Ads credentials are separate from Ap
 ## Pick the API first
 
 - Direct `asc ads <resource> ...` commands use Apple Ads Platform API v1 and an ad account ID.
-- Deprecated Campaign Management API v5 commands live under `asc ads v5 ...` and use an organization ID. Apple retires v5 on January 26, 2027.
-- Never substitute an org ID for an ad account ID. The CLI keeps them separate.
+- The CLI removed Campaign Management API v5 commands in 6.0.0. Every former `asc ads v5 ...` invocation exits 2 before authentication or network access; use the Platform API v1 replacement when one exists.
+- `--org`, `ASC_ADS_ORG_ID`, and stored `org_id` values remain available as organization metadata reported by `asc ads auth status` and `asc ads auth discover`. They do not scope v1 requests; never substitute an org ID for an ad account ID.
 - Run the exact leaf command with `--help` before building a request file. Platform v1 payloads and response envelopes differ from v5; the CLI does not translate them.
 - For non-interactive pipelines, pass `--file -` to read a JSON request body from stdin; the CLI rejects it when stdin is a terminal.
 - Resource, report, upload, and raw commands emit lossless JSON. Use `jq` for projections instead of asking for table or markdown output.
 
 ## Authenticate and pin the account
 
-Store both contexts when a profile must support v1 and legacy v5:
+Set an ad-account default for Platform API v1. Add an organization ID only when it is useful in auth status or discovery output; v1 requests still require an ad account:
 
 ```bash
 asc ads auth login \
@@ -40,6 +40,7 @@ export ASC_ADS_TEAM_ID="SEARCHADS_TEAM_ID"
 export ASC_ADS_KEY_ID="KEY_ID"
 export ASC_ADS_PRIVATE_KEY_PATH="$HOME/.asc/apple-ads-private-key.pem"
 export ASC_ADS_AD_ACCOUNT_ID="987654"
+export ASC_ADS_ORG_ID="123456" # optional metadata for auth status and discovery
 export ASC_ADS_BYPASS_KEYCHAIN=1
 ```
 
@@ -55,7 +56,7 @@ asc ads auth doctor --output json
 
 Discovery calls Platform v1 `GET /v1/me` and `GET /v1/acls`. Compare each ACL's ad-account ID, name, organization ID, and roles; never select the first result automatically. Print the chosen account before any mutation, then pass both `--ads-profile "Marketing"` and `--ad-account "987654"` when more than one profile or account is available.
 
-For named profiles, the profile's `ad_account_id` and `org_id` stand alone; they do not inherit context from another profile or root config. V1 context precedence is `--ad-account`, `ASC_ADS_AD_ACCOUNT_ID`, the selected profile, then profile-less root config. Legacy v5 uses the matching `--org` and `ASC_ADS_ORG_ID` chain.
+For named profiles, the profile's `ad_account_id` and `org_id` stand alone; they do not inherit context from another profile or root config. V1 request context precedence is `--ad-account`, `ASC_ADS_AD_ACCOUNT_ID`, the selected profile, then profile-less root config. Organization context is metadata for auth status and discovery, not an API account selector.
 
 ## Start read-only
 
@@ -227,32 +228,24 @@ asc ads api request \
 
 Unknown mutations fail closed, and risky known mutations require `--confirm`. The raw command rejects multipart asset upload; use `asc ads assets upload`.
 
-Keep legacy calls explicit:
+## Migrate existing v5 scripts to Platform API v1
 
-```bash
-asc ads v5 api request \
-  --method POST \
-  --path v5/campaigns/find \
-  --ads-profile "Marketing" \
-  --org "123456" \
-  --file selector.json \
-  --output json
-```
+The CLI removed its `asc ads v5` namespace in 6.0.0. Old invocations exit 2 before authentication or network access, and the error names a replacement when one exists. For scripts that still contain removed command paths, rewrite the request body and response parser for v1; the CLI does not translate v5 payloads. Common moves:
 
-## Migrate v5 one command at a time
-
-Keep existing v5 payloads under `asc ads v5` until each script has a reviewed v1 body and response parser. Common moves:
-
-| Deprecated v5 | Platform API v1 |
+| Former CLI v5 command | Current Platform API v1 command |
 | --- | --- |
-| `asc ads v5 campaigns list` | `asc ads campaigns find` |
-| `asc ads v5 apps localized-details` | `asc ads apps locales find` |
-| `asc ads v5 product-pages list` | `asc ads product-pages find` |
-| `asc ads v5 reports campaigns` | `asc ads reports apps campaigns` |
-| `asc ads v5 campaigns pause` / `resume` | `asc ads campaigns pause` / `resume` |
-| v5 campaign or ad-group negative keywords | `asc ads negative-keywords ...` with scope in the body |
+| `asc ads v5 campaigns list --org ORG_ID` (removed) | `asc ads campaigns find --ad-account AD_ACCOUNT_ID --file query.json` |
+| `asc ads v5 apps localized-details` (removed) | `asc ads apps locales find --adam-id ADAM_ID --ad-account AD_ACCOUNT_ID` |
+| `asc ads v5 product-pages list` (removed) | `asc ads product-pages find --ad-account AD_ACCOUNT_ID` |
+| `asc ads v5 reports campaigns --file report.json` (removed) | `asc ads reports apps campaigns --file report.json --ad-account AD_ACCOUNT_ID` |
+| `asc ads v5 campaigns pause --campaign ID --confirm` (removed) | `asc ads campaigns pause --campaign CAMPAIGN_ID --ad-account AD_ACCOUNT_ID` |
+| `asc ads v5 campaigns resume --campaign ID --confirm` (removed) | `asc ads campaigns resume --campaign CAMPAIGN_ID --ad-account AD_ACCOUNT_ID --confirm` |
+| `asc ads v5 api request --path v5/...` (removed) | `asc ads api request --method POST --path v1/... --ad-account AD_ACCOUNT_ID` |
+| v5 campaign or ad-group negative-keyword command (removed) | `asc ads negative-keywords ...` with the scope in the v1 body |
 
-Seven v5 leaves have no one-command v1 replacement: product-page countries, product-page devices, targeting-keyword bulk delete, both negative-keyword bulk deletes, and impression-share report list and view. Do not pretend that `geo search`, `insights impression-share`, or single-resource deletes preserve those contracts.
+Seven former v5 commands have no one-command v1 replacement: product-page countries, product-page devices, targeting-keyword bulk delete, both negative-keyword bulk deletes, and impression-share report list and view. Do not treat `geo search`, `insights impression-share`, or single-resource deletes as equivalent replacements.
+
+`--org`, `ASC_ADS_ORG_ID`, and stored `org_id` values remain usable for the organization reported by `asc ads auth status` and `asc ads auth discover`. They do not replace `--ad-account` or `ASC_ADS_AD_ACCOUNT_ID` on v1 resource requests.
 
 ## Finish live tests cleanly
 
