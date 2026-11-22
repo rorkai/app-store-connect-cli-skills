@@ -21,7 +21,8 @@ inspect an incomplete publication before retrying. Compiler and signer logs go
 to stderr; receipts go to stdout.
 
 Signing inputs are explicit local files. Protect the identity and password file
-with owner-only permissions; the password file contains one line. The profile
+with owner-only permissions; the password file contains one line. Keep them
+outside the repository (or gitignored) and never commit them. The profile
 must match the exact app bundle ID and certificate and authorize the requested
 entitlements. Omission of `--entitlements` does not inherit optional capabilities.
 Use `asc-signing-setup` for separately authorized provisioning work.
