@@ -42,7 +42,7 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
    - `asc certificates list --certificate-type IOS_DISTRIBUTION`
    - `asc certificates create --certificate-type IOS_DISTRIBUTION --csr "./cert.csr"`
    - Or generate a key and CSR inline:
-     - `asc certificates create --certificate-type IOS_DISTRIBUTION --generate-csr --key-out "./signing/dist.key" --csr-out "./signing/dist.csr"`
+     - `asc certificates create --certificate-type IOS_DISTRIBUTION --generate-csr --key-out "$HOME/.asc/signing/dist.key" --csr-out "$HOME/.asc/signing/dist.csr"`
    - For Wallet passes, create the Pass Type ID first, then create its certificate:
      - `asc pass-type-ids create --identifier "pass.com.example" --name "Example Pass"`
      - `asc certificates create --certificate-type PASS_TYPE_ID --pass-type-id "PASS_TYPE_ID" --csr "./pass.csr"`
@@ -63,6 +63,7 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
    - Pass `--install-dir` when automation must target a fixed directory.
 
 ## Rotation and cleanup
+Revoke or delete only the certificates and profiles the user names; confirm IDs with a list or view first.
 - Revoke old certificates:
   - `asc certificates revoke --id "CERT_ID" --confirm`
 - Audit remote provisioning profiles before deleting or rotating:
@@ -78,10 +79,11 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
 ## APNs and Sign in with Apple keys
 Developer Portal keys need an authenticated web session (`asc web auth login`).
 - List existing keys, including APNs keys: `asc web sign-in-keys list --output table`
-- Create an APNs key for sandbox and production; the one-time P8 is saved as `AuthKey_<KEY_ID>.p8` with mode `0600`:
-  - `asc web push-keys create --name "Example Push" --output-dir "./keys" --confirm`
-  - `asc web push-keys download --key-id "KEY_ID" --output-dir "./keys" --confirm`
-- Revoking is permanent and breaks every service signing with the key. Confirm the key ID and its services with `asc web sign-in-keys view` first:
+- Create an APNs key for sandbox and production. The one-time P8 is written to `--output-dir` as `AuthKey_<KEY_ID>.p8` with mode `0600`, and its contents are never printed. Choose a private directory outside the repository, and never print, paste, or commit the P8:
+  - `asc web push-keys create --name "Example Push" --output-dir "$HOME/.asc/keys" --confirm`
+  - `asc web push-keys download --key-id "KEY_ID" --output-dir "$HOME/.asc/keys" --confirm`
+  - Create and download keys on the user's own machine, not in CI. Store the P8 in the CI provider's secret store, and remove it from a shared or self-hosted runner after use.
+- Revoking is permanent and breaks every service signing with the key. Revoke only when the user asks for that key; confirm its ID and services with `asc web sign-in-keys view` first:
   - `asc web push-keys revoke --key-id "KEY_ID" --confirm`
   - `asc web sign-in-keys revoke --key-id "KEY_ID" --confirm`
 - Revoke refuses a key of the other service or one shared with another service, and never retries. Create and download are not retried either; list keys before retrying a failed create.
@@ -90,24 +92,24 @@ Developer Portal keys need an authenticated web session (`asc web auth login`).
 Use this when you want a lightweight, non-interactive alternative to fastlane match for encrypted git-backed certificate/profile storage.
 
 ```bash
-# Protect secret inputs before use
-chmod 600 "./signing-sync-password" "./distribution.p12" "./distribution-p12-password"
+# Keep these files outside the repository; never commit them. Protect them before use.
+chmod 600 "$HOME/.asc/signing/sync-password" "$HOME/.asc/signing/distribution.p12" "$HOME/.asc/signing/distribution-p12-password"
 
 # Push a usable private identity with its matching certificate and profile
 asc signing sync push \
   --bundle-id "com.example.app" \
   --profile-type IOS_APP_ADHOC \
   --repo "git@github.com:team/certs.git" \
-  --password-file "./signing-sync-password" \
-  --identity "./distribution.p12" \
-  --identity-password-file "./distribution-p12-password" \
+  --password-file "$HOME/.asc/signing/sync-password" \
+  --identity "$HOME/.asc/signing/distribution.p12" \
+  --identity-password-file "$HOME/.asc/signing/distribution-p12-password" \
   --output json
 
-# Pull and decrypt them into a local directory
+# Pull and decrypt them into a private directory outside the repository (the default --output-dir is ./signing)
 asc signing sync pull \
   --repo "git@github.com:team/certs.git" \
-  --password-file "./signing-sync-password" \
-  --output-dir "./signing" \
+  --password-file "$HOME/.asc/signing/sync-password" \
+  --output-dir "$HOME/.asc/signing/pulled" \
   --output json
 ```
 
@@ -157,9 +159,9 @@ child command:
 
 ```bash
 asc signing run \
-  --identity "./signing/App.p12" \
-  --identity-password-file "./signing/App-password" \
-  --profile "./signing/App.mobileprovision" \
+  --identity "$HOME/.asc/signing/App.p12" \
+  --identity-password-file "$HOME/.asc/signing/App-password" \
+  --profile "$HOME/.asc/signing/App.mobileprovision" \
   --receipt ".asc/distribution/signing-run.json" \
   -- xcodebuild -exportArchive \
     -archivePath ".asc/artifacts/App.xcarchive" \
