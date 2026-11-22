@@ -68,7 +68,7 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 ## Authentication and defaults
 - Prefer keychain auth via `asc auth login`.
 - Fallback env vars: `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_PRIVATE_KEY_PATH`, `ASC_PRIVATE_KEY`, `ASC_PRIVATE_KEY_B64`.
-- When another service signs tokens, set `ASC_BEARER_TOKEN` instead of a key. For runs longer than a token's 20-minute lifetime, set `ASC_BEARER_TOKEN_COMMAND` to a command that prints a fresh token; `asc` renews it before expiry.
+- When another service signs tokens, set `ASC_BEARER_TOKEN` instead of a key. For runs longer than a token's 20-minute lifetime, set `ASC_BEARER_TOKEN_COMMAND` to a command that prints a fresh token; `asc` renews it before expiry. Never print, log, or paste the token or the command's output.
 - Use `asc auth status --validate` to check stored credentials and any bearer token against Apple. JSON output reports the token under `bearerToken` without printing it. A key Apple refuses, for example because of a missing or expired agreement, is reported as failed and exits 1.
 - `ASC_APP_ID` can provide a default app ID.
 - App Store Server API reads (transactions, subscription status, refunds, notification history) live under `asc storekit` and use separate In-App Purchase keys registered with `asc storekit auth login`, not `asc auth` profiles.
