@@ -23,7 +23,12 @@ groups. A version ID is different from its product, subscription, or group ID.
 - Do not use the product- or group-scoped v1 localization commands. API 4.4.1
   deprecates those resources, and the CLI now emits migration warnings for
   their compatibility commands.
-- Never pass a product, subscription, or group ID to a version-scoped command.
+- Never pass a product, subscription, or group ID as a `--version-id`.
+- To read a subscription's localizations without resolving a version, run
+  `asc subscriptions versions localizations list --subscription-id "SUB_ID"`.
+  It reads the newest version (the draft when one exists, else the live
+  version) and also accepts a product ID or exact name with `--app`. Resolve
+  the explicit version ID before any write.
 
 Resolve or create versions before localizing them:
 

@@ -28,7 +28,7 @@ Common current device-type anchors:
 - `IPHONE_65` for the common 6.5-inch iPhone screenshot set.
 - `IPAD_PRO_3GEN_129` for the common 12.9/13-inch iPad screenshot set.
 
-Run `asc screenshots sizes --all` when targeting other display types such as 6.9-inch iPhone, Apple TV, Mac, Vision Pro, iMessage, or Watch.
+Run `asc screenshots sizes --all` when targeting other display types such as 6.9-inch iPhone, Apple TV, Mac, Vision Pro, iMessage (including the iPhone Duo set, `IMESSAGE_APP_IPHONE_DUO`), or Watch.
 
 ## Workflow
 
@@ -120,3 +120,4 @@ sips -m "/System/Library/ColorSync/Profiles/sRGB IEC61966-2.1.icc" input.png --o
 ```
 
 - Prefer `asc screenshots validate` over visual inspection before upload.
+- In a `--path` directory, `asc screenshots validate` and `asc screenshots upload` use only `.png`, `.jpg`, and `.jpeg` files; other files, including hidden files such as `.DS_Store`, are skipped with a warning.

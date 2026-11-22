@@ -22,6 +22,8 @@ asc apps info list --app "APP_ID" --output table
 asc metadata pull --app "APP_ID" --app-info "APP_INFO_ID" --version "1.2.3" --platform IOS --dir "./metadata"
 ```
 
+Pulling again into the same `--dir` refreshes files that still match App Store Connect. If any file has unpushed local edits, the pull lists them and exits 2 before writing anything; push them first, or pass `--force` only when the remote copy should win.
+
 ### 2. Edit local files
 
 Canonical files are written under:
@@ -60,6 +62,8 @@ Apply after the plan looks correct:
 ```bash
 asc metadata push --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata"
 ```
+
+Push and apply send only the fields that changed in each localization, so editing one field on a live version does not resend locked ones. When App Store Connect refuses `whatsNew` on an app's first version, the other fields are still pushed, a warning is printed, and the result records `"skippedFields": ["whatsNew"]`. On later versions a refused `whatsNew` still fails.
 
 Use `asc metadata apply` when the user wants the apply-named command shape for the same canonical files:
 

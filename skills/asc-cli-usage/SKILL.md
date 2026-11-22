@@ -32,6 +32,8 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
   - `asc review submissions-get --id "SUBMISSION_ID" --include items,appStoreVersionForReview`
 - Single-resource and child-list reads have their own commands, such as `asc localizations view --id "LOCALIZATION_ID"`, `asc testflight groups builds list --group-id "GROUP_ID"`, and `asc pricing availability territory-availabilities --app "APP_ID"`.
 - Use `asc api <METHOD> <PATH>` only when no native command covers the task. Its writes require `--confirm`. Do not hand-write `curl` requests with `asc auth token`.
+  - `asc api PATH` with no method sends a GET.
+  - The path, GET query parameter names and documented values, and POST or PATCH body attribute and relationship names are checked against the embedded schema. A mismatch exits 2 before any request and names the native command or the documented parameter it most likely means. Pass `--allow-unknown-path` only for a path, parameter, or attribute Apple added after the schema snapshot.
 
 ## Canonical verbs (current asc)
 - Prefer `view` over legacy `get` aliases for read-only commands in docs and automation.
@@ -54,6 +56,7 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 - Destructive operations require `--confirm`.
 - Use `--paginate` when the user wants all pages.
 - Put command-specific flags after the leaf subcommand; parent command groups reject misplaced flags.
+- Give a non-repeatable flag once. Repeating it with a different value, including once before and once after positional arguments, exits 2. Repeatable flags such as `asc api --query` add values.
 - Treat `--next` URLs as opaque continuations. Do not combine them with new filters, sorting, or page-size flags; follow the selected command's help for required selectors.
 
 ## Output formats
@@ -65,6 +68,8 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 ## Authentication and defaults
 - Prefer keychain auth via `asc auth login`.
 - Fallback env vars: `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_PRIVATE_KEY_PATH`, `ASC_PRIVATE_KEY`, `ASC_PRIVATE_KEY_B64`.
+- When another service signs tokens, set `ASC_BEARER_TOKEN` instead of a key. For runs longer than a token's 20-minute lifetime, set `ASC_BEARER_TOKEN_COMMAND` to a command that prints a fresh token; `asc` renews it before expiry.
+- Use `asc auth status --validate` to check stored credentials and any bearer token against Apple. JSON output reports the token under `bearerToken` without printing it. A key Apple refuses, for example because of a missing or expired agreement, is reported as failed and exits 1.
 - `ASC_APP_ID` can provide a default app ID.
 - App Store Server API reads (transactions, subscription status, refunds, notification history) live under `asc storekit` and use separate In-App Purchase keys registered with `asc storekit auth login`, not `asc auth` profiles.
 - When permissions are unclear, inspect exact API key role coverage with `asc web auth capabilities`.

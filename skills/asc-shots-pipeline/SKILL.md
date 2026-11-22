@@ -192,7 +192,7 @@ asc screenshots reorder --set-id "SET_ID" --ids "THIRD_ID,FIRST_ID,SECOND_ID"
 - Re-check command paths with `asc screenshots --help` because screenshot commands are evolving quickly.
 - Keep outputs deterministic: default to JSON for machine steps.
 - Prefer `asc screenshots list-frame-devices --output json` before selecting a frame device.
-- Ensure screenshot files exist before upload.
+- Ensure screenshot files exist before upload. Only `.png`, `.jpg`, and `.jpeg` files in a `--path` directory are uploaded; check the skipped-file warnings on stderr.
 - Reorder an uploaded set with `asc screenshots reorder`; never delete and re-upload screenshots to change their order.
 - Use explicit long flags (`--app`, `--output`, `--version-localization`, etc.).
 - Treat screenshot-local automation as experimental and call it out in user-facing handoff notes.
