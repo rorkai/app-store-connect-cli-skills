@@ -79,8 +79,8 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
 Developer Portal keys need an authenticated web session (`asc web auth login`).
 - List existing keys, including APNs keys: `asc web sign-in-keys list --output table`
 - Create an APNs key for sandbox and production. The one-time P8 is written to `--output-dir` as `AuthKey_<KEY_ID>.p8` with mode `0600`, and its contents are never printed. Choose a private directory outside the repository, and never print, paste, or commit the P8:
-  - `asc web push-keys create --name "Example Push" --output-dir "./keys" --confirm`
-  - `asc web push-keys download --key-id "KEY_ID" --output-dir "./keys" --confirm`
+  - `asc web push-keys create --name "Example Push" --output-dir "$HOME/.asc/keys" --confirm`
+  - `asc web push-keys download --key-id "KEY_ID" --output-dir "$HOME/.asc/keys" --confirm`
 - Revoking is permanent and breaks every service signing with the key. Revoke only when the user asks for that key; confirm its ID and services with `asc web sign-in-keys view` first:
   - `asc web push-keys revoke --key-id "KEY_ID" --confirm`
   - `asc web sign-in-keys revoke --key-id "KEY_ID" --confirm`
