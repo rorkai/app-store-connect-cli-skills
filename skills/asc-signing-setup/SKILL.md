@@ -53,6 +53,7 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
      - `asc profiles create --name "Dev Profile" --profile-type IOS_APP_DEVELOPMENT --bundle "BUNDLE_ID" --certificate "CERT_ID" --device "DEVICE_ID"`
 5. Download the profile:
    - `asc profiles download --id "PROFILE_ID" --output "./profiles/AppStore.mobileprovision"`
+   - An existing `--output` file is refused before anything is fetched; add `--overwrite` only when replacing it intentionally.
 6. Inspect and install the downloaded profile locally when needed:
    - `asc profiles inspect --path "./profiles/AppStore.mobileprovision" --output table`
    - `asc profiles inspect --path "./profiles/AppStore.mobileprovision" --entitlements --output markdown`
@@ -73,6 +74,17 @@ Use this skill when you need to create or renew signing assets for iOS/macOS app
   - `asc profiles local clean --expired --dry-run`
   - `asc profiles local clean --expired --confirm`
   - Check the resolved directory in the dry-run output before confirming, or pin it with `--install-dir`.
+
+## APNs and Sign in with Apple keys
+Developer Portal keys need an authenticated web session (`asc web auth login`).
+- List existing keys, including APNs keys: `asc web sign-in-keys list --output table`
+- Create an APNs key for sandbox and production; the one-time P8 is saved as `AuthKey_<KEY_ID>.p8` with mode `0600`:
+  - `asc web push-keys create --name "Example Push" --output-dir "./keys" --confirm`
+  - `asc web push-keys download --key-id "KEY_ID" --output-dir "./keys" --confirm`
+- Revoking is permanent and breaks every service signing with the key. Confirm the key ID and its services with `asc web sign-in-keys view` first:
+  - `asc web push-keys revoke --key-id "KEY_ID" --confirm`
+  - `asc web sign-in-keys revoke --key-id "KEY_ID" --confirm`
+- Revoke refuses a key of the other service or one shared with another service, and never retries. Create and download are not retried either; list keys before retrying a failed create.
 
 ## Shared team storage with `asc signing sync`
 Use this when you want a lightweight, non-interactive alternative to fastlane match for encrypted git-backed certificate/profile storage.

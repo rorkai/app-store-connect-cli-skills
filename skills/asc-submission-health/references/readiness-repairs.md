@@ -95,7 +95,7 @@ asc metadata push --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metad
 asc metadata push --app "APP_ID" --version "1.2.3" --platform IOS --dir "./metadata"
 ```
 
-Review the dry-run diff before applying metadata. Do not overwrite local changes with a pull unless the user has chosen the remote copy as the source of truth.
+Review the dry-run diff before applying metadata. A re-pull keeps files with unpushed local edits and exits 2 before writing; add `--force` only when the user has chosen the remote copy as the source of truth.
 
 ## App info and privacy policy URL
 

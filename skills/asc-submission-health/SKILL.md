@@ -65,6 +65,8 @@ asc validate subscriptions --app "APP_ID" --output table
 
 Treat the ordered remediation plan from `asc validate` as the repair queue. Fix and verify one class of blocker before moving to the next.
 
+In JSON output, each `remediation.steps[]` entry can carry `resolution.commands` with the fix command. When `resolution.needsUserInput` is `true`, the commands contain UPPERCASE placeholders, such as a price, territories, age rating `LEVEL`, copyright, listing URLs, or a screenshot path and device type. Ask the user for those values; never run a placeholder command as printed.
+
 ## Route repairs
 
 Use public API commands when the blocker is build processing, metadata, screenshots, review details, encryption, content rights, age rating, availability, or version-scoped product metadata.
@@ -167,6 +169,7 @@ There is no dedicated retry command. Use this sequence:
 | --- | --- | --- |
 | Version is not in a valid state | `asc validate`, `asc review doctor` | ordered readiness repairs |
 | Export compliance must be approved | build info and encryption declaration | readiness repairs |
+| China mainland App Compliance requirement is unanswered | `asc web apps compliance list --app "APP_ID"` (web session) | answer with `asc web apps compliance set ... --dry-run`, then `--confirm` once the user supplies the evidence |
 | Multiple app infos found | `asc apps info list --app "APP_ID"` | resolve exact app-info ID |
 | IAP or subscription is not ready | product validator | digital-goods reference |
 | Game Center component or version is not ready | `asc validate` diagnostic | `asc-release-flow` multi-item preparation section |
