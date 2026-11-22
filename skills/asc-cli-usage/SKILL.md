@@ -68,7 +68,7 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
 ## Authentication and defaults
 - Prefer keychain auth via `asc auth login`.
 - Fallback env vars: `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_PRIVATE_KEY_PATH`, `ASC_PRIVATE_KEY`, `ASC_PRIVATE_KEY_B64`.
-- When another service signs tokens, set `ASC_BEARER_TOKEN` instead of a key. For runs longer than a token's 20-minute lifetime, set `ASC_BEARER_TOKEN_COMMAND` to a command that prints a fresh token; `asc` renews it before expiry. Never print, log, or paste the token or the command's output.
+- When another service signs tokens, set `ASC_BEARER_TOKEN` instead of a key. For runs longer than a token's 20-minute lifetime, set `ASC_BEARER_TOKEN_COMMAND` to a command that prints a fresh token; `asc` renews it before expiry. Never print, log, or paste the token or the command's output. Pass it from a secret store or the CI provider's masked secrets, not as an inline `export` in shell history or a workflow file.
 - Use `asc auth status --validate` to check stored credentials and any bearer token against Apple. JSON output reports the token under `bearerToken` without printing it. A key Apple refuses, for example because of a missing or expired agreement, is reported as failed and exits 1.
 - `ASC_APP_ID` can provide a default app ID.
 - App Store Server API reads (transactions, subscription status, refunds, notification history) live under `asc storekit` and use separate In-App Purchase keys registered with `asc storekit auth login`, not `asc auth` profiles.
@@ -77,9 +77,9 @@ Use this skill when you need to run or design `asc` commands for App Store Conne
   - It can resolve the current local auth by default, or inspect a specific key with `--key-id`.
 - Create an App Store Connect team API key through a cached Apple Account web session with `asc web api-keys create`.
   - An Account Holder or Admin session is required; use `asc web auth login --apple-id "user@example.com"` first when needed.
-  - The command saves the one-time P8 as `AuthKey_<KEY_ID>.p8` without printing its contents; choose an explicit private directory with `--output-dir`.
-  - Example: `asc web api-keys create --name "CI uploads" --role APP_MANAGER --output-dir "./keys" --output json`.
-- Register a JSON API key file with `asc auth login --key-json ./api-key.json`. It reads `key_id`, `issuer_id`, and `key` (PEM text, or base64 when `is_key_content_base64` is `true`); `in_house: true` selects an enterprise key. This replaces `--key-id`, `--issuer-id`, and `--private-key`. Without keychain storage, the private key is written to a `0600` file under the `keys` directory beside the config, so keep that directory private and out of source control.
+  - The command saves the one-time P8 as `AuthKey_<KEY_ID>.p8` (mode `0600`) without printing its contents. Always pass `--output-dir` with a private directory outside the repository (the default is the current directory), and never print, paste, or commit the P8.
+  - Example: `asc web api-keys create --name "CI uploads" --role APP_MANAGER --output-dir "$HOME/.asc/keys" --output json`.
+- Register a JSON API key file with `asc auth login --key-json "$HOME/.asc/api-key.json"`. It reads `key_id`, `issuer_id`, and `key` (PEM text, or base64 when `is_key_content_base64` is `true`); `in_house: true` selects an enterprise key. This replaces `--key-id`, `--issuer-id`, and `--private-key`. Without keychain storage, the private key is written to a `0600` file under the `keys` directory beside the config, so keep that directory private and out of source control. Keep the JSON file outside the repository and delete it after `asc auth login` stores the key.
 
 ## Reuse authentication before requesting another code
 - API-key authentication (`asc auth`) and Apple Account web sessions (`asc web auth`) are separate. Prefer the existing keychain API profile for supported operations; inspect `asc auth status` and command capabilities before starting a web login. A profile name is a local label, not an app-level permission boundary.
